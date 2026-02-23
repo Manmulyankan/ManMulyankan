@@ -350,7 +350,7 @@ body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;back
   h+='</div>';
 
 class="disclaimer"><strong>Clinical Disclaimer:</strong> This digital Stroop test is for educational and informational purposes only. It is not a substitute for a formal neuropsychological evaluation. Consult a qualified healthcare professional.</div>
-  <div class="restart-wrap"><button class="btn btn-primary" id="retryBtn">Restart Full Assessment</button></div>
+  <div class="restart-wrap"><button class="btn-save" onclick="triggerSave()">Download PDF Report</button> <button class="btn btn-primary" id="retryBtn">Restart Full Assessment</button></div>
 </div>
 
 </div><!-- /main-wrap -->
@@ -496,6 +496,146 @@ function saveResultsToFile(testName, resultData){
   URL.revokeObjectURL(a.href);
 }
 
+
+/* ═══ PDF REPORT GENERATOR ═══ */
+function generatePDF(testName, participant, results) {
+  var scr = document.createElement('script');
+  scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  scr.onload = function() {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF('p', 'mm', 'a4');
+    var W = 210, H = 297, M = 18, y = 0;
+    var cW = W - M * 2;
+
+    function setFont(size, style) { doc.setFontSize(size); if(style==='bold') doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal'); }
+    function addLine(x1,y1,x2,y2,color) { doc.setDrawColor(color||'#ddd'); doc.setLineWidth(0.3); doc.line(x1,y1,x2,y2); }
+    function checkPage(need) { if(y+need > H-20) { doc.addPage(); y=20; drawHeader(); } }
+    function drawHeader() {
+      doc.setFillColor('#1a2340'); doc.rect(0,0,W,42,'F');
+      setFont(18,'bold'); doc.setTextColor('#ffffff'); doc.text('ManMulyankan',M,18);
+      setFont(8,'normal'); doc.setTextColor('#8890a4'); doc.text('Cognitive Assessment Platform · manmulyankan.com',M,25);
+      setFont(10,'bold'); doc.setTextColor('#6b8aff'); doc.text(testName.replace(/_/g,' ').toUpperCase()+' REPORT',M,35);
+      y=50;
+    }
+    function drawBar(x, barY, w, pct, color) {
+      doc.setFillColor('#e8e8e8'); doc.roundedRect(x,barY,w,4,2,2,'F');
+      if(pct>0){ doc.setFillColor(color||'#6b8aff'); doc.roundedRect(x,barY,w*(pct/100),4,2,2,'F'); }
+    }
+
+    drawHeader();
+
+    // Participant Info Box
+    doc.setFillColor('#f5f6f8'); doc.roundedRect(M,y,cW,22,3,3,'F');
+    doc.setDrawColor('#ddd'); doc.roundedRect(M,y,cW,22,3,3,'S');
+    setFont(8,'bold'); doc.setTextColor('#333');
+    doc.text('Participant:',M+4,y+7); doc.text('Age:',M+4,y+14); doc.text('Date:',M+80,y+7); doc.text('Time:',M+80,y+14);
+    setFont(8,'normal'); doc.setTextColor('#555');
+    doc.text(participant.name||'-',M+28,y+7);
+    doc.text(String(participant.age||'-'),M+14,y+14);
+    var now=results._date||new Date();
+    if(typeof now==='string') now=new Date(now);
+    doc.text(now.toLocaleDateString('en-GB'),M+92,y+7);
+    doc.text(now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),M+92,y+14);
+    y+=30;
+
+    // ═══ SCORES SECTION ═══
+    if(results.mainScore!==undefined){
+      setFont(12,'bold'); doc.setTextColor('#1a2340'); doc.text('Overall Score',M,y); y+=8;
+      doc.setFillColor('#f0f4ff'); doc.roundedRect(M,y,cW,18,3,3,'F');
+      setFont(22,'bold'); doc.setTextColor('#6b8aff');
+      doc.text(String(results.mainScore),M+cW/2,y+13,{align:'center'});
+      if(results.maxScore){ setFont(9,'normal'); doc.setTextColor('#888'); doc.text('/ '+results.maxScore,M+cW/2+14,y+13); }
+      y+=22;
+      if(results.classification){ setFont(10,'bold'); doc.setTextColor('#333'); doc.text('Classification: '+results.classification,M,y); y+=8; }
+    }
+
+    // ═══ DOMAIN SCORES ═══
+    if(results.domains && typeof results.domains==='object'){
+      y+=4; setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Domain Scores',M,y); y+=8;
+      var dkeys=Object.keys(results.domains);
+      dkeys.forEach(function(k){
+        checkPage(14);
+        var d=results.domains[k];
+        var dName=d.name||k, dScore=d.scaled||d.score||d.pct||0, dMax=d.total||100;
+        var pct=(d.pct!==undefined)?d.pct:(d.scaled?Math.round((d.scaled-55)/90*100):Math.round(d.score/d.total*100));
+        setFont(8,'bold'); doc.setTextColor('#333'); doc.text(dName,M,y);
+        setFont(8,'normal'); doc.setTextColor('#888'); doc.text(String(dScore)+(d.total?' ('+d.correct+'/'+d.total+')':''),M+cW-30,y,{align:'right'});
+        y+=3; drawBar(M,y,cW-35,Math.min(100,Math.max(0,pct)),d.color||'#6b8aff'); y+=9;
+      });
+    }
+
+    // ═══ CATEGORY SCORES (for QoL, Depression) ═══
+    if(results.categories && Array.isArray(results.categories)){
+      y+=4; checkPage(12); setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Category Breakdown',M,y); y+=8;
+      results.categories.forEach(function(cat){
+        checkPage(14);
+        setFont(8,'bold'); doc.setTextColor('#333'); doc.text(cat.name,M,y);
+        setFont(8,'normal'); doc.setTextColor('#888'); doc.text(String(cat.score||cat.value||''),M+cW-10,y,{align:'right'});
+        y+=3; drawBar(M,y,cW-15,cat.pct||0,cat.color||'#6b8aff'); y+=9;
+      });
+    }
+
+    // ═══ INTERPRETATION ═══
+    if(results.interpretation){
+      y+=4; checkPage(20); setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Interpretation',M,y); y+=7;
+      setFont(8,'normal'); doc.setTextColor('#444');
+      var lines=doc.splitTextToSize(results.interpretation,cW);
+      lines.forEach(function(l){ checkPage(6); doc.text(l,M,y); y+=5; });
+      y+=4;
+    }
+
+    // ═══ RESPONSES TABLE ═══
+    if(results.responses && Array.isArray(results.responses) && results.responses.length>0){
+      y+=4; checkPage(16);
+      setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Response Details',M,y); y+=8;
+
+      // Table header
+      var colQ=M, colR=M+cW*0.65, colS=M+cW*0.85;
+      doc.setFillColor('#1a2340'); doc.rect(M,y-4,cW,7,'F');
+      setFont(7,'bold'); doc.setTextColor('#fff');
+      doc.text('Question',colQ+2,y);
+      doc.text('Response',colR,y);
+      doc.text('Score',colS,y);
+      y+=6;
+
+      var alt=false;
+      results.responses.forEach(function(r,i){
+        checkPage(10);
+        if(alt){ doc.setFillColor('#f8f9fb'); doc.rect(M,y-4,cW,8,'F'); }
+        alt=!alt;
+        setFont(6.5,'normal'); doc.setTextColor('#333');
+        var qText=(i+1)+'. '+(r.question||r.q||'Q'+(i+1));
+        var qLines=doc.splitTextToSize(qText,cW*0.62);
+        doc.text(qLines[0],colQ+2,y);
+        doc.setTextColor('#555');
+        var rText=String(r.answer||r.response||r.selected||'-');
+        var rLines=doc.splitTextToSize(rText,cW*0.18);
+        doc.text(rLines[0],colR,y);
+        doc.setTextColor('#6b8aff'); setFont(7,'bold');
+        doc.text(String(r.score!==undefined?r.score:'-'),colS+5,y);
+        y+=Math.max(6, qLines.length*4+2);
+      });
+    }
+
+    // ═══ DISCLAIMER ═══
+    y+=6; checkPage(20);
+    addLine(M,y,W-M,y,'#ddd'); y+=6;
+    setFont(7,'normal'); doc.setTextColor('#999');
+    var disc='Disclaimer: This assessment is for educational and screening purposes only. It is not a substitute for professional clinical diagnosis. Results should be interpreted by a qualified healthcare professional.';
+    var dLines=doc.splitTextToSize(disc,cW);
+    dLines.forEach(function(l){ doc.text(l,M,y); y+=4; });
+    y+=4;
+    setFont(6,'normal'); doc.setTextColor('#bbb');
+    doc.text('Generated by ManMulyankan (manmulyankan.com) on '+new Date().toLocaleString('en-GB'),M,y);
+
+    // Save
+    var pName=(participant.name||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+    var dStr=new Date().toISOString().slice(0,10);
+    doc.save(pName+'_'+testName+'_'+dStr+'.pdf');
+  };
+  document.head.appendChild(scr);
+}
+
 </script>
 <script>
 const barFills={};
@@ -601,10 +741,155 @@ function saveResultsToFile(testName, resultData){
 
 
 function triggerSave(){
-  var setResults={};
-  ['A','B','C','D'].forEach(function(s){var st=state[s];var avgRt=st.rts.length>0?Math.round(st.rts.reduce(function(a,b){return a+b},0)/st.rts.length):0;setResults['Set'+s]={correct:st.correct,total:TRIALS_PER_SET,avgRT_ms:avgRt}});
-  saveResultsToFile('stroop_test',{sets:setResults,stroopEffect_ms:setResults.SetC.avgRT_ms-setResults.SetB.avgRT_ms,inhibitionCost_ms:setResults.SetD.avgRT_ms-setResults.SetB.avgRT_ms});
+  generatePDF('stroop_test',{name:window._pName||'',age:window._pAge||''},{
+    _date:new Date(),
+    mainScore:window._lastComposite||'',maxScore:100,
+    classification:window._lastClassification||'',
+    domains:window._lastDomains||{},
+    interpretation:window._lastInterpretation||'',
+    responses:window._lastResponses||[]
+  });
 }
+
+/* ═══ PDF REPORT GENERATOR ═══ */
+function generatePDF(testName, participant, results) {
+  var scr = document.createElement('script');
+  scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  scr.onload = function() {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF('p', 'mm', 'a4');
+    var W = 210, H = 297, M = 18, y = 0;
+    var cW = W - M * 2;
+
+    function setFont(size, style) { doc.setFontSize(size); if(style==='bold') doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal'); }
+    function addLine(x1,y1,x2,y2,color) { doc.setDrawColor(color||'#ddd'); doc.setLineWidth(0.3); doc.line(x1,y1,x2,y2); }
+    function checkPage(need) { if(y+need > H-20) { doc.addPage(); y=20; drawHeader(); } }
+    function drawHeader() {
+      doc.setFillColor('#1a2340'); doc.rect(0,0,W,42,'F');
+      setFont(18,'bold'); doc.setTextColor('#ffffff'); doc.text('ManMulyankan',M,18);
+      setFont(8,'normal'); doc.setTextColor('#8890a4'); doc.text('Cognitive Assessment Platform · manmulyankan.com',M,25);
+      setFont(10,'bold'); doc.setTextColor('#6b8aff'); doc.text(testName.replace(/_/g,' ').toUpperCase()+' REPORT',M,35);
+      y=50;
+    }
+    function drawBar(x, barY, w, pct, color) {
+      doc.setFillColor('#e8e8e8'); doc.roundedRect(x,barY,w,4,2,2,'F');
+      if(pct>0){ doc.setFillColor(color||'#6b8aff'); doc.roundedRect(x,barY,w*(pct/100),4,2,2,'F'); }
+    }
+
+    drawHeader();
+
+    // Participant Info Box
+    doc.setFillColor('#f5f6f8'); doc.roundedRect(M,y,cW,22,3,3,'F');
+    doc.setDrawColor('#ddd'); doc.roundedRect(M,y,cW,22,3,3,'S');
+    setFont(8,'bold'); doc.setTextColor('#333');
+    doc.text('Participant:',M+4,y+7); doc.text('Age:',M+4,y+14); doc.text('Date:',M+80,y+7); doc.text('Time:',M+80,y+14);
+    setFont(8,'normal'); doc.setTextColor('#555');
+    doc.text(participant.name||'-',M+28,y+7);
+    doc.text(String(participant.age||'-'),M+14,y+14);
+    var now=results._date||new Date();
+    if(typeof now==='string') now=new Date(now);
+    doc.text(now.toLocaleDateString('en-GB'),M+92,y+7);
+    doc.text(now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),M+92,y+14);
+    y+=30;
+
+    // ═══ SCORES SECTION ═══
+    if(results.mainScore!==undefined){
+      setFont(12,'bold'); doc.setTextColor('#1a2340'); doc.text('Overall Score',M,y); y+=8;
+      doc.setFillColor('#f0f4ff'); doc.roundedRect(M,y,cW,18,3,3,'F');
+      setFont(22,'bold'); doc.setTextColor('#6b8aff');
+      doc.text(String(results.mainScore),M+cW/2,y+13,{align:'center'});
+      if(results.maxScore){ setFont(9,'normal'); doc.setTextColor('#888'); doc.text('/ '+results.maxScore,M+cW/2+14,y+13); }
+      y+=22;
+      if(results.classification){ setFont(10,'bold'); doc.setTextColor('#333'); doc.text('Classification: '+results.classification,M,y); y+=8; }
+    }
+
+    // ═══ DOMAIN SCORES ═══
+    if(results.domains && typeof results.domains==='object'){
+      y+=4; setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Domain Scores',M,y); y+=8;
+      var dkeys=Object.keys(results.domains);
+      dkeys.forEach(function(k){
+        checkPage(14);
+        var d=results.domains[k];
+        var dName=d.name||k, dScore=d.scaled||d.score||d.pct||0, dMax=d.total||100;
+        var pct=(d.pct!==undefined)?d.pct:(d.scaled?Math.round((d.scaled-55)/90*100):Math.round(d.score/d.total*100));
+        setFont(8,'bold'); doc.setTextColor('#333'); doc.text(dName,M,y);
+        setFont(8,'normal'); doc.setTextColor('#888'); doc.text(String(dScore)+(d.total?' ('+d.correct+'/'+d.total+')':''),M+cW-30,y,{align:'right'});
+        y+=3; drawBar(M,y,cW-35,Math.min(100,Math.max(0,pct)),d.color||'#6b8aff'); y+=9;
+      });
+    }
+
+    // ═══ CATEGORY SCORES (for QoL, Depression) ═══
+    if(results.categories && Array.isArray(results.categories)){
+      y+=4; checkPage(12); setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Category Breakdown',M,y); y+=8;
+      results.categories.forEach(function(cat){
+        checkPage(14);
+        setFont(8,'bold'); doc.setTextColor('#333'); doc.text(cat.name,M,y);
+        setFont(8,'normal'); doc.setTextColor('#888'); doc.text(String(cat.score||cat.value||''),M+cW-10,y,{align:'right'});
+        y+=3; drawBar(M,y,cW-15,cat.pct||0,cat.color||'#6b8aff'); y+=9;
+      });
+    }
+
+    // ═══ INTERPRETATION ═══
+    if(results.interpretation){
+      y+=4; checkPage(20); setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Interpretation',M,y); y+=7;
+      setFont(8,'normal'); doc.setTextColor('#444');
+      var lines=doc.splitTextToSize(results.interpretation,cW);
+      lines.forEach(function(l){ checkPage(6); doc.text(l,M,y); y+=5; });
+      y+=4;
+    }
+
+    // ═══ RESPONSES TABLE ═══
+    if(results.responses && Array.isArray(results.responses) && results.responses.length>0){
+      y+=4; checkPage(16);
+      setFont(11,'bold'); doc.setTextColor('#1a2340'); doc.text('Response Details',M,y); y+=8;
+
+      // Table header
+      var colQ=M, colR=M+cW*0.65, colS=M+cW*0.85;
+      doc.setFillColor('#1a2340'); doc.rect(M,y-4,cW,7,'F');
+      setFont(7,'bold'); doc.setTextColor('#fff');
+      doc.text('Question',colQ+2,y);
+      doc.text('Response',colR,y);
+      doc.text('Score',colS,y);
+      y+=6;
+
+      var alt=false;
+      results.responses.forEach(function(r,i){
+        checkPage(10);
+        if(alt){ doc.setFillColor('#f8f9fb'); doc.rect(M,y-4,cW,8,'F'); }
+        alt=!alt;
+        setFont(6.5,'normal'); doc.setTextColor('#333');
+        var qText=(i+1)+'. '+(r.question||r.q||'Q'+(i+1));
+        var qLines=doc.splitTextToSize(qText,cW*0.62);
+        doc.text(qLines[0],colQ+2,y);
+        doc.setTextColor('#555');
+        var rText=String(r.answer||r.response||r.selected||'-');
+        var rLines=doc.splitTextToSize(rText,cW*0.18);
+        doc.text(rLines[0],colR,y);
+        doc.setTextColor('#6b8aff'); setFont(7,'bold');
+        doc.text(String(r.score!==undefined?r.score:'-'),colS+5,y);
+        y+=Math.max(6, qLines.length*4+2);
+      });
+    }
+
+    // ═══ DISCLAIMER ═══
+    y+=6; checkPage(20);
+    addLine(M,y,W-M,y,'#ddd'); y+=6;
+    setFont(7,'normal'); doc.setTextColor('#999');
+    var disc='Disclaimer: This assessment is for educational and screening purposes only. It is not a substitute for professional clinical diagnosis. Results should be interpreted by a qualified healthcare professional.';
+    var dLines=doc.splitTextToSize(disc,cW);
+    dLines.forEach(function(l){ doc.text(l,M,y); y+=4; });
+    y+=4;
+    setFont(6,'normal'); doc.setTextColor('#bbb');
+    doc.text('Generated by ManMulyankan (manmulyankan.com) on '+new Date().toLocaleString('en-GB'),M,y);
+
+    // Save
+    var pName=(participant.name||'Unknown').replace(/[^a-zA-Z0-9]/g,'_');
+    var dStr=new Date().toISOString().slice(0,10);
+    doc.save(pName+'_'+testName+'_'+dStr+'.pdf');
+  };
+  document.head.appendChild(scr);
+}
+
 </script>
 </body>
 </html>

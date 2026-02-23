@@ -319,19 +319,46 @@ function sendAI(){
 function askAI(q){
   openAI();
   var body=document.getElementById('aiBody');
-  // Add user message
   body.innerHTML+='<div class="ai-msg user"><div class="ai-bubble">'+escHtml(q)+'</div></div>';
-  // Add typing indicator
   body.innerHTML+='<div class="ai-msg ai" id="aiTyping"><div class="ai-typing"><span></span><span></span><span></span></div></div>';
   body.scrollTop=body.scrollHeight;
 
-  // Generate AI response
-  setTimeout(function(){
-    var reply=generateAIResponse(q);
+  // Try API search first, fallback to local
+  fetchAIResponse(q).then(function(reply){
     var typing=document.getElementById('aiTyping');
     if(typing)typing.outerHTML='<div class="ai-msg ai"><div class="ai-bubble">'+reply+'</div></div>';
     body.scrollTop=body.scrollHeight;
-  },800+Math.random()*600);
+  });
+}
+
+async function fetchAIResponse(q){
+  try{
+    var systemPrompt='You are ManMulyankan AI Assistant — a helpful expert on cognitive assessments, mental health screening, and psychological well-being. You help users find the right tests on ManMulyankan platform and answer questions about cognitive health. Available tests on our platform: Depression Screening (BDI) at /test/depression_screening, Trail Making Test at /test/trail_making, Stroop Color Test at /test/stroop_test, Digit Span Test at /test/digit_span, Quality of Life at /test/quality_of_life, Intelligence Screening ages 5-16 (WISC-V) at /test/wisc_v, Intelligence Screening ages 17-30 (WAIS-V) at /test/wais_v_young, Intelligence Screening ages 31-55 (WAIS-V) at /test/wais_v_adult, Cognitive Screening ages 56+ (MoCA) at /test/moca. When recommending tests, include clickable links like <a href="/test/depression_screening">Depression Screening</a>. Keep answers concise (under 150 words). Use <strong> for emphasis and <br> for line breaks. Format nicely with HTML.';
+
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:systemPrompt,
+        messages:[{role:'user',content:q}],
+        tools:[{type:'web_search_20250305',name:'web_search'}]
+      })
+    });
+
+    if(!res.ok) throw new Error('API error');
+    var data=await res.json();
+    var text=data.content.map(function(item){return item.type==='text'?item.text:''}).filter(Boolean).join('');
+    // Clean up any markdown
+    text=text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    text=text.replace(/\n/g,'<br>');
+    if(text.trim()) return text;
+    throw new Error('Empty response');
+  }catch(e){
+    console.log('API unavailable, using local:',e);
+    return generateAIResponse(q);
+  }
 }
 
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
