@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ManMulyankan — Cognitive Assessment Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1e2028;--card:#2a2d35;--border:#363840;--navy:#eaecf0;--ink:#c8ccd4;--slate:#9498a4;--grey:#70747e;--blue:#6b8aff;--blue-d:#5570d9;--blue-glow:rgba(107,138,255,.1);--r:16px;--font:'Outfit',sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);min-height:100vh;padding:0}
+.shapes{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.shapes div{position:absolute;opacity:0;animation:si 2s ease forwards}
+.sc1{top:-80px;right:-60px;width:420px;height:420px;border:3px solid rgba(107,138,255,.4);border-radius:50%;animation:si 1.5s .2s ease forwards,dr 25s ease-in-out infinite!important}
+.ss1{bottom:60px;left:-30px;width:180px;height:180px;border:3px solid rgba(240,184,48,.35);transform:rotate(15deg);animation:si 1.5s .5s ease forwards,sp 40s linear infinite!important}
+.st1{top:40%;right:5%;width:0;height:0;border-left:70px solid transparent;border-right:70px solid transparent;border-bottom:120px solid rgba(240,112,112,.25);animation:si 1.5s .8s ease forwards,bb 18s ease-in-out infinite!important}
+@keyframes si{to{opacity:.35}}@keyframes dr{0%,100%{transform:translate(0,0)}50%{transform:translate(-15px,20px)}}@keyframes sp{to{transform:rotate(375deg)}}@keyframes bb{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");background-size:128px 128px}
+.topbar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:14px;padding:12px 28px;background:rgba(30,32,40,.92);backdrop-filter:blur(24px);border-bottom:1px solid rgba(107,138,255,.1)}
+.tb-logo{width:36px;height:36px;background:var(--blue);border-radius:10px;position:relative;overflow:hidden}
+.tb-logo::before{content:'';position:absolute;top:6px;left:6px;width:10px;height:10px;border:2px solid rgba(255,255,255,.7);border-radius:50%}
+.tb-logo::after{content:'';position:absolute;bottom:5px;right:5px;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid rgba(255,255,255,.6)}
+.tb-t{font-size:.95rem;font-weight:800;color:var(--navy)}.tb-s{font-size:.66rem;color:var(--grey);margin-top:1px}
+.tb-right{margin-left:auto;display:flex;gap:12px;align-items:center}
+.tb-link{font-size:.78rem;color:var(--slate);text-decoration:none;font-weight:600;padding:6px 14px;border:1px solid var(--border);border-radius:8px;transition:all .2s}
+.tb-link:hover{color:var(--blue);border-color:var(--blue)}
+.wrap{position:relative;z-index:10;max-width:960px;margin:0 auto;padding:40px 24px 60px}
+.hero{text-align:center;margin-bottom:48px}
+.hero h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;color:var(--navy);margin-bottom:12px}
+.hero p{color:var(--slate);font-size:.95rem;max-width:600px;margin:0 auto;line-height:1.65}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.test-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:28px 24px;transition:all .25s;cursor:pointer;text-decoration:none;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
+.test-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.test-card:hover{border-color:var(--blue);transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.tc-icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem;color:#fff;font-weight:800}
+.tc-name{font-size:1.05rem;font-weight:800;color:var(--navy)}
+.tc-desc{font-size:.82rem;color:var(--slate);line-height:1.55;flex:1}
+.tc-meta{display:flex;gap:12px;font-size:.7rem;color:var(--grey);font-weight:600}
+.tc-tag{padding:3px 10px;background:rgba(107,138,255,.08);border:1px solid rgba(107,138,255,.15);border-radius:50px;color:var(--blue);font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.c1::before{background:#5bb8f5}.c1 .tc-icon{background:#5bb8f5}
+.c2::before{background:#b49dff}.c2 .tc-icon{background:#b49dff}
+.c3::before{background:#f07070}.c3 .tc-icon{background:#f07070}
+.c4::before{background:#5ec49a}.c4 .tc-icon{background:#5ec49a}
+.c5::before{background:#f0b830}.c5 .tc-icon{background:#f0b830}
+</style>
+</head>
+<body>
+<div class="shapes"><div class="sc1"></div><div class="ss1"></div><div class="st1"></div></div>
+<div class="topbar">
+  <div class="tb-logo"></div>
+  <div><div class="tb-t">ManMulyankan</div><div class="tb-s">Cognitive Assessment Platform</div></div>
+  <div class="tb-right"><a class="tb-link" href="/admin">Admin Panel</a></div>
+</div>
+<div class="wrap">
+  <div class="hero">
+    <h2>Cognitive Assessment Suite</h2>
+    <p>Select an assessment below to begin. Each test measures a different aspect of cognitive or psychological functioning. Results are securely stored for clinical review.</p>
+  </div>
+  <div class="grid">
+    <a class="test-card c1" href="/test/depression_screening">
+      <div class="tc-icon">BDI</div>
+      <div class="tc-name">Depression Screening</div>
+      <div class="tc-desc">Beck Depression Inventory — 21-item self-report measure assessing severity of depressive symptoms across affective, cognitive, and somatic domains.</div>
+      <div class="tc-meta"><span>21 Questions</span><span>~10 min</span></div>
+      <span class="tc-tag">Mood Assessment</span>
+    </a>
+    <a class="test-card c2" href="/test/trail_making">
+      <div class="tc-icon">TMT</div>
+      <div class="tc-name">Trail Making Test</div>
+      <div class="tc-desc">Parts A and B — measures visual attention, processing speed, task switching, and executive functioning through sequential connect-the-dots tasks.</div>
+      <div class="tc-meta"><span>2 Parts</span><span>~5 min</span></div>
+      <span class="tc-tag">Executive Function</span>
+    </a>
+    <a class="test-card c3" href="/test/stroop_test">
+      <div class="tc-icon">SCT</div>
+      <div class="tc-name">Stroop Color Test</div>
+      <div class="tc-desc">Four-set colour-word interference paradigm measuring selective attention, cognitive flexibility, and inhibitory control.</div>
+      <div class="tc-meta"><span>4 Sets x 20 Trials</span><span>~8 min</span></div>
+      <span class="tc-tag">Attention &amp; Inhibition</span>
+    </a>
+    <a class="test-card c4" href="/test/digit_span">
+      <div class="tc-icon">DST</div>
+      <div class="tc-name">Digit Span Test</div>
+      <div class="tc-desc">Forward and backward digit recall — standardised measure of short-term auditory memory and working memory capacity.</div>
+      <div class="tc-meta"><span>2 Sets</span><span>~10 min</span></div>
+      <span class="tc-tag">Working Memory</span>
+    </a>
+    <a class="test-card c5" href="/test/quality_of_life">
+      <div class="tc-icon">QoL</div>
+      <div class="tc-name">Quality of Life</div>
+      <div class="tc-desc">26-item assessment measuring perceived quality of life across Physical Health, Psychological, Social, and Environmental domains.</div>
+      <div class="tc-meta"><span>26 Questions</span><span>~5 min</span></div>
+      <span class="tc-tag">Well-being</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>

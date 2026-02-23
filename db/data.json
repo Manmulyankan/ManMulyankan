@@ -1,0 +1,12 @@
+{
+  "admins": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "$2a$10$vGatsqJN6.dFs8Prtui1A.uuVgJdaboxoCAIp/73z9XXOR.RQ54NK"
+    }
+  ],
+  "participants": [],
+  "sessions": [],
+  "nextId": 2
+}
