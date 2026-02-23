@@ -174,7 +174,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 <nav class="topbar" id="topbar">
   <a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div>
   <div class="tb-text"><div class="tb-t">ManMulyankan</div><div class="tb-s">Cognitive Assessment Platform</div></div></a>
-  <div class="tb-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="topSearch" placeholder="Search tests..." onkeydown="if(event.key==='Enter')handleAISearch()" oninput="filterTests()"></div>
+  <div class="tb-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="topSearch" placeholder="Search tests..." onkeydown="if(event.key==='Enter')handleAISearch()"></div>
   <div class="tb-nav">
     <a class="tb-link" href="#about">About</a>
     <a class="tb-link" href="#tests">Tests</a>
@@ -285,12 +285,7 @@ window.addEventListener('scroll',function(){document.getElementById('topbar').cl
 var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el)});
 function filterTests(){
-  var topQ=document.getElementById('topSearch').value;
-  var inlineQ=document.getElementById('searchTests').value;
-  // Sync both search bars
-  if(document.activeElement===document.getElementById('topSearch')){document.getElementById('searchTests').value=topQ}
-  else if(document.activeElement===document.getElementById('searchTests')){document.getElementById('topSearch').value=inlineQ}
-  var q=(topQ||inlineQ).toLowerCase();var cards=document.querySelectorAll('.test-card');var found=0;cards.forEach(function(c){var name=(c.getAttribute('data-name')||'')+' '+c.textContent;var match=name.toLowerCase().includes(q);c.style.display=match?'':'none';if(match)found++});document.getElementById('noResults').style.display=found===0?'block':'none'}
+  var q=document.getElementById('searchTests').value.toLowerCase();var cards=document.querySelectorAll('.test-card');var found=0;cards.forEach(function(c){var name=(c.getAttribute('data-name')||'')+' '+c.textContent;var match=name.toLowerCase().includes(q);c.style.display=match?'':'none';if(match)found++});document.getElementById('noResults').style.display=found===0?'block':'none'}
 
 // ═══ AI ASSISTANT ═══
 function handleAISearch(){
