@@ -70,6 +70,7 @@ tr:hover td{background:rgba(107,138,255,.03)}
   <div class="tb-right">
     <a class="tb-btn" href="/">View Tests</a>
     <a class="tb-btn" href="/api/admin/export">Export CSV</a>
+    <button class="tb-btn" onclick="showPassModal()">Change Password</button>
     <a class="tb-btn danger" href="/admin/logout">Logout</a>
   </div>
 </div>
@@ -115,6 +116,22 @@ tr:hover td{background:rgba(107,138,255,.03)}
     <button class="modal-close" onclick="closeModal()">Close</button>
     <h3 id="modalTitle">Result Detail</h3>
     <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Password Modal -->
+<div class="modal-bg" id="passModalBg">
+  <div class="modal" style="max-width:400px">
+    <button class="modal-close" onclick="closePassModal()">Close</button>
+    <h3>Change Admin Password</h3>
+    <div style="margin-top:16px">
+      <div style="margin-bottom:12px"><label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">Current Password</label><input type="password" id="cpCurrent" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none"></div>
+      <div style="margin-bottom:12px"><label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">New Password</label><input type="password" id="cpNew" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none"></div>
+      <div style="margin-bottom:16px"><label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);display:block;margin-bottom:4px">Confirm New Password</label><input type="password" id="cpConfirm" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.9rem;outline:none"></div>
+      <div id="cpError" style="display:none;background:rgba(240,112,112,.1);border:1px solid rgba(240,112,112,.2);color:var(--red);padding:8px;border-radius:6px;font-size:.8rem;margin-bottom:12px"></div>
+      <div id="cpSuccess" style="display:none;background:rgba(94,196,154,.1);border:1px solid rgba(94,196,154,.2);color:var(--green);padding:8px;border-radius:6px;font-size:.8rem;margin-bottom:12px"></div>
+      <button onclick="changePassword()" style="width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:var(--font)">Update Password</button>
+    </div>
   </div>
 </div>
 
@@ -248,6 +265,25 @@ document.getElementById('filterTest').addEventListener('change', function() { cu
 // Init
 loadStats();
 loadResults();
+
+// Password modal
+function showPassModal(){document.getElementById('passModalBg').classList.add('show');document.getElementById('cpError').style.display='none';document.getElementById('cpSuccess').style.display='none'}
+function closePassModal(){document.getElementById('passModalBg').classList.remove('show')}
+document.getElementById('passModalBg').addEventListener('click',function(e){if(e.target===this)closePassModal()});
+async function changePassword(){
+  var cur=document.getElementById('cpCurrent').value,np=document.getElementById('cpNew').value,cf=document.getElementById('cpConfirm').value;
+  var err=document.getElementById('cpError'),suc=document.getElementById('cpSuccess');
+  err.style.display='none';suc.style.display='none';
+  if(!cur||!np){err.textContent='Please fill all fields';err.style.display='block';return}
+  if(np.length<6){err.textContent='New password must be at least 6 characters';err.style.display='block';return}
+  if(np!==cf){err.textContent='Passwords do not match';err.style.display='block';return}
+  try{
+    var res=await fetch('/api/admin/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current:cur,newPass:np})});
+    var d=await res.json();
+    if(d.success){suc.textContent='Password changed successfully!';suc.style.display='block';document.getElementById('cpCurrent').value='';document.getElementById('cpNew').value='';document.getElementById('cpConfirm').value=''}
+    else{err.textContent=d.error||'Failed to change password';err.style.display='block'}
+  }catch(e){err.textContent='Connection error';err.style.display='block'}
+}
 </script>
 </body>
 </html>

@@ -205,6 +205,11 @@ canvas{display:block;width:100%;cursor:crosshair;background:var(--offwhite)}
 @media(max-width:400px){
   .topbar,.tb{flex-wrap:wrap}
 }
+
+/* ═══ FLOWING PROGRESS DOT ═══ */
+.progress-fill,.prog-fill,.cat-fill,.domain-fill{position:relative}
+.progress-fill::after,.prog-fill::after{content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:12px;height:12px;background:var(--yellow,#f0b830);border-radius:50%;box-shadow:0 0 12px rgba(240,184,48,.6),0 0 24px rgba(240,184,48,.3);animation:dotPulse 1.5s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 8px rgba(240,184,48,.5),0 0 16px rgba(240,184,48,.2)}50%{box-shadow:0 0 16px rgba(240,184,48,.8),0 0 32px rgba(240,184,48,.4)}}
 </style>
 </head>
 <body>

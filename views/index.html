@@ -22,11 +22,17 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 @keyframes si{to{opacity:1}}@keyframes dr{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,25px)}}@keyframes dr2{0%,100%{transform:translate(0,0)}50%{transform:translate(15px,-20px)}}@keyframes sp{to{transform:rotate(375deg)}}@keyframes bb{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
 .topbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;gap:14px;padding:14px 32px;background:rgba(17,18,24,.85);backdrop-filter:blur(24px);border-bottom:1px solid rgba(107,138,255,.08);transition:all .3s}
 .topbar.scrolled{padding:10px 32px;box-shadow:0 4px 30px rgba(0,0,0,.3)}
-.tb-logo{width:40px;height:40px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:12px;position:relative;overflow:hidden;flex-shrink:0}
-.tb-logo::before{content:'';position:absolute;top:8px;left:8px;width:12px;height:12px;border:2.5px solid rgba(255,255,255,.8);border-radius:50%}
-.tb-logo::after{content:'';position:absolute;bottom:6px;right:6px;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:12px solid rgba(255,255,255,.7)}
-.tb-text{display:flex;flex-direction:column}.tb-t{font-size:1rem;font-weight:800;color:var(--navy);letter-spacing:-.02em}.tb-s{font-size:.6rem;color:var(--grey);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
-.tb-nav{margin-left:auto;display:flex;gap:6px;align-items:center}
+.tb-logo{width:48px;height:48px;background:linear-gradient(135deg,#2a4ecf,#1a3ab0);border-radius:14px;position:relative;overflow:hidden;flex-shrink:0}
+.tb-logo::before{content:'';position:absolute;top:10px;left:10px;width:14px;height:14px;border:2.5px solid rgba(255,255,255,.85);border-radius:50%}
+.tb-logo::after{content:'';position:absolute;bottom:7px;right:7px;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid rgba(255,255,255,.75)}
+.tb-text{display:flex;flex-direction:column}.tb-t{font-size:1.25rem;font-weight:900;color:var(--navy);letter-spacing:-.03em}.tb-s{font-size:.68rem;color:var(--grey);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+
+.tb-search{position:relative;margin-left:auto;flex:0 1 280px}
+.tb-search input{width:100%;padding:9px 14px 9px 36px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;color:var(--navy);font-family:var(--font);font-size:.82rem;outline:none;transition:all .25s}
+.tb-search input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(107,138,255,.1)}
+.tb-search input::placeholder{color:var(--grey)}
+.tb-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--grey);pointer-events:none}
+.tb-nav{display:flex;gap:6px;align-items:center}
 .tb-link{font-size:.78rem;color:var(--slate);text-decoration:none;font-weight:600;padding:8px 16px;border-radius:8px;transition:all .2s}
 .tb-link:hover{color:var(--navy);background:var(--blue-glow)}
 .tb-link.cta{background:var(--blue);color:#fff;font-weight:700}.tb-link.cta:hover{background:var(--blue-d)}
@@ -101,12 +107,50 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .footer p{font-size:.75rem;color:var(--grey)}.footer a{color:var(--blue);text-decoration:none}.footer a:hover{text-decoration:underline}
 .divider{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 32px}
 .divider hr{border:none;border-top:1px solid var(--border)}
+
+/* ═══ AI SEARCH ═══ */
+.tb-search input{padding-right:44px!important}
+.ai-search-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);padding:5px 10px;background:linear-gradient(135deg,#2a4ecf,#1a3ab0);color:#fff;border:none;border-radius:7px;font-size:.65rem;font-weight:800;cursor:pointer;font-family:var(--font);letter-spacing:.04em;transition:all .2s}
+.ai-search-btn:hover{background:linear-gradient(135deg,#3558d9,#2244c0);transform:translateY(-50%) scale(1.05)}
+/* AI Modal */
+.ai-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);z-index:500;display:none;place-items:center}
+.ai-modal-bg.show{display:grid}
+.ai-modal{background:var(--card);border:1.5px solid var(--border);border-radius:20px;width:90%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;animation:aiIn .3s ease;overflow:hidden}
+@keyframes aiIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.ai-header{display:flex;align-items:center;gap:10px;padding:18px 20px;border-bottom:1px solid var(--border)}
+.ai-logo{width:32px;height:32px;background:linear-gradient(135deg,#2a4ecf,#1a3ab0);border-radius:9px;display:grid;place-items:center;font-size:.7rem;color:#fff;font-weight:900}
+.ai-header-text{font-size:.95rem;font-weight:800;color:var(--navy)}
+.ai-header-sub{font-size:.65rem;color:var(--grey)}
+.ai-close{margin-left:auto;padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--grey);cursor:pointer;font-family:var(--font);font-size:.78rem}
+.ai-close:hover{border-color:var(--red);color:var(--red)}
+.ai-body{flex:1;overflow-y:auto;padding:20px}
+.ai-msg{margin-bottom:16px;animation:fadeUp .4s ease}
+.ai-msg.user{text-align:right}
+.ai-msg.user .ai-bubble{background:linear-gradient(135deg,#2a4ecf,#1a3ab0);color:#fff;display:inline-block;text-align:left}
+.ai-msg.ai .ai-bubble{background:var(--bg);border:1px solid var(--border);color:var(--ink)}
+.ai-bubble{padding:14px 18px;border-radius:14px;font-size:.85rem;line-height:1.65;max-width:90%;display:inline-block}
+.ai-bubble a{color:var(--blue);font-weight:700;text-decoration:none}
+.ai-bubble a:hover{text-decoration:underline}
+.ai-typing{display:inline-flex;gap:4px;padding:14px 18px;background:var(--bg);border:1px solid var(--border);border-radius:14px}
+.ai-typing span{width:6px;height:6px;background:var(--grey);border-radius:50%;animation:typDot .8s ease infinite}
+.ai-typing span:nth-child(2){animation-delay:.15s}
+.ai-typing span:nth-child(3){animation-delay:.3s}
+@keyframes typDot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+.ai-input-wrap{display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--border)}
+.ai-input{flex:1;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;background:var(--bg);color:var(--navy);font-family:var(--font);font-size:.88rem;outline:none}
+.ai-input:focus{border-color:var(--blue)}
+.ai-send{padding:12px 20px;background:linear-gradient(135deg,#2a4ecf,#1a3ab0);color:#fff;border:none;border-radius:12px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:var(--font)}
+.ai-send:hover{opacity:.9}
+.ai-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.ai-sug{padding:6px 14px;background:var(--blue-glow);border:1px solid rgba(107,138,255,.15);border-radius:50px;font-size:.72rem;font-weight:600;color:var(--blue);cursor:pointer;transition:all .2s}
+.ai-sug:hover{background:rgba(107,138,255,.15)}
+
 .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
 #noResults{display:none;text-align:center;padding:40px;color:var(--grey);font-size:.9rem}
 
 @media(max-width:768px){
-  .topbar{padding:12px 18px}.tb-s{display:none}.tb-nav{gap:4px}.tb-link{padding:6px 12px;font-size:.72rem}
+  .topbar{padding:12px 18px;flex-wrap:wrap}.tb-s{display:none}.tb-search{flex:0 1 200px;order:10;margin-left:0}.tb-nav{gap:4px}.tb-link{padding:6px 12px;font-size:.72rem}
   .hero{padding:120px 20px 50px}.hero h1{font-size:2rem}.hero-sub{font-size:.9rem}
   .hero-actions{flex-direction:column;align-items:center}.btn-primary,.btn-secondary{width:100%;text-align:center}
   .stats-bar{gap:24px;padding:24px 20px}.stat-num{font-size:1.5rem}
@@ -120,7 +164,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
   .hero{padding:110px 16px 40px}.hero h1{font-size:1.7rem}
   .stats-bar{gap:20px}.stat-num{font-size:1.3rem}
   .how-grid{grid-template-columns:1fr}.about-visual{grid-template-columns:1fr}
-  .tb-t{font-size:.88rem}
+  .tb-t{font-size:1rem}.tb-search{flex:1 1 100%;order:10;margin-top:6px}
 }
 </style>
 </head>
@@ -130,6 +174,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 <nav class="topbar" id="topbar">
   <div class="tb-logo"></div>
   <div class="tb-text"><div class="tb-t">ManMulyankan</div><div class="tb-s">Cognitive Assessment Platform</div></div>
+  <div class="tb-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="topSearch" placeholder="Ask AI or search tests..." onkeydown="if(event.key==='Enter')handleAISearch()" oninput="filterTests()"><button class="ai-search-btn" onclick="handleAISearch()" title="Ask AI">AI</button></div>
   <div class="tb-nav">
     <a class="tb-link" href="#about">About</a>
     <a class="tb-link" href="#tests">Tests</a>
@@ -152,7 +197,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
   <div class="stat-item"><div class="stat-num">9+</div><div class="stat-label">Assessments</div></div>
   <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label">Free Access</div></div>
   <div class="stat-item"><div class="stat-num">24/7</div><div class="stat-label">Available</div></div>
-  <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">Data Sold</div></div>
+  
 </div>
 
 <div class="divider"><hr></div>
@@ -224,7 +269,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
     <p class="section-desc" style="margin:8px auto 0;max-width:500px">Have questions, feedback, or want to collaborate? Reach out — we'd love to hear from you.</p>
     <div class="contact-grid">
       <div class="contact-card"><div class="cc-label">Created By</div><div class="cc-value">Shubham Kaushal</div><div class="cc-sub">Founder &amp; Developer</div></div>
-      <div class="contact-card"><div class="cc-label">Email</div><div class="cc-value"><a href="mailto:shubhamkaushal006@gmail.com">shubhamkaushal006@gmail.com</a></div><div class="cc-sub">We typically respond within 24 hours</div></div>
+      <div class="contact-card"><div class="cc-label">Email</div><div class="cc-value"><a href="mailto:manmulyankan@gmail.com">manmulyankan@gmail.com</a></div><div class="cc-sub">We typically respond within 24 hours</div></div>
       <div class="contact-card"><div class="cc-label">Website</div><div class="cc-value"><a href="https://manmulyankan.com">manmulyankan.com</a></div><div class="cc-sub">Free &amp; open access platform</div></div>
       <div class="contact-card"><div class="cc-label">Disclaimer</div><div class="cc-value" style="font-size:.82rem;font-weight:500;color:var(--ink)">These assessments are for educational and screening purposes only — not a substitute for professional clinical diagnosis.</div></div>
     </div>
@@ -232,14 +277,165 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 </section>
 
 <footer class="footer">
-  <p>&copy; 2026 <a href="/">ManMulyankan</a> — Empowering early detection through digital assessment. Built by <a href="mailto:shubhamkaushal006@gmail.com">Shubham Kaushal</a>.</p>
+  <p>&copy; 2026 <a href="/">ManMulyankan</a> — Empowering early detection through digital assessment. Built by <a href="mailto:manmulyankan@gmail.com">Shubham Kaushal</a>.</p>
 </footer>
 
 <script>
 window.addEventListener('scroll',function(){document.getElementById('topbar').classList.toggle('scrolled',window.scrollY>60)});
 var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el)});
-function filterTests(){var q=document.getElementById('searchTests').value.toLowerCase();var cards=document.querySelectorAll('.test-card');var found=0;cards.forEach(function(c){var name=(c.getAttribute('data-name')||'')+' '+c.textContent;var match=name.toLowerCase().includes(q);c.style.display=match?'':'none';if(match)found++});document.getElementById('noResults').style.display=found===0?'block':'none'}
+function filterTests(){
+  var topQ=document.getElementById('topSearch').value;
+  var inlineQ=document.getElementById('searchTests').value;
+  // Sync both search bars
+  if(document.activeElement===document.getElementById('topSearch')){document.getElementById('searchTests').value=topQ}
+  else if(document.activeElement===document.getElementById('searchTests')){document.getElementById('topSearch').value=inlineQ}
+  var q=(topQ||inlineQ).toLowerCase();var cards=document.querySelectorAll('.test-card');var found=0;cards.forEach(function(c){var name=(c.getAttribute('data-name')||'')+' '+c.textContent;var match=name.toLowerCase().includes(q);c.style.display=match?'':'none';if(match)found++});document.getElementById('noResults').style.display=found===0?'block':'none'}
+
+// ═══ AI ASSISTANT ═══
+function handleAISearch(){
+  var q=document.getElementById('topSearch').value.trim();
+  if(!q)return;
+  // Check if it's a test search or an AI question
+  var testMatch=false;
+  document.querySelectorAll('.test-card').forEach(function(card){
+    var name=(card.getAttribute('data-name')||'')+' '+card.textContent;
+    if(name.toLowerCase().includes(q.toLowerCase()))testMatch=true;
+  });
+  if(!testMatch||q.length>20||q.includes('?')||q.includes('how')||q.includes('what')||q.includes('which')||q.includes('why')||q.includes('help')||q.includes('improve')||q.includes('mean')){
+    openAI();askAI(q);document.getElementById('topSearch').value='';
+  }
+}
+function openAI(){document.getElementById('aiModalBg').classList.add('show')}
+function closeAI(){document.getElementById('aiModalBg').classList.remove('show')}
+document.getElementById('aiModalBg').addEventListener('click',function(e){if(e.target===this)closeAI()});
+
+function sendAI(){
+  var input=document.getElementById('aiInput');
+  var q=input.value.trim();if(!q)return;
+  input.value='';askAI(q);
+}
+
+function askAI(q){
+  openAI();
+  var body=document.getElementById('aiBody');
+  // Add user message
+  body.innerHTML+='<div class="ai-msg user"><div class="ai-bubble">'+escHtml(q)+'</div></div>';
+  // Add typing indicator
+  body.innerHTML+='<div class="ai-msg ai" id="aiTyping"><div class="ai-typing"><span></span><span></span><span></span></div></div>';
+  body.scrollTop=body.scrollHeight;
+
+  // Generate AI response
+  setTimeout(function(){
+    var reply=generateAIResponse(q);
+    var typing=document.getElementById('aiTyping');
+    if(typing)typing.outerHTML='<div class="ai-msg ai"><div class="ai-bubble">'+reply+'</div></div>';
+    body.scrollTop=body.scrollHeight;
+  },800+Math.random()*600);
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ═══ AI KNOWLEDGE BASE ═══
+function generateAIResponse(q){
+  var ql=q.toLowerCase();
+  var tests=[
+    {name:'Depression Screening (BDI)',url:'/test/depression_screening',age:'All ages',time:'10 min',desc:'Measures severity of depressive symptoms across 21 items covering mood, guilt, sleep, appetite, and energy.',keywords:['depress','sad','mood','anxiety','sleep','energy','guilt','hopeless','bdi','suicide','mental health']},
+    {name:'Trail Making Test',url:'/test/trail_making',age:'All ages',time:'5 min',desc:'Measures visual attention, processing speed, and executive functioning through connect-the-dots tasks.',keywords:['trail','attention','speed','executive','focus','concentrat','processing','visual scan']},
+    {name:'Stroop Color Test',url:'/test/stroop_test',age:'All ages',time:'8 min',desc:'Measures selective attention, cognitive flexibility, and inhibitory control through colour-word interference.',keywords:['stroop','color','colour','inhibit','attention','interference','focus','impulse','self-control']},
+    {name:'Digit Span Test',url:'/test/digit_span',age:'All ages',time:'10 min',desc:'Measures short-term auditory memory and working memory through forward and backward digit recall.',keywords:['digit','memory','working memory','short-term','remember','forget','recall','span','wais']},
+    {name:'Quality of Life',url:'/test/quality_of_life',age:'All ages',time:'5 min',desc:'26-item assessment of perceived quality across Physical, Psychological, Social, and Environmental domains.',keywords:['quality','life','well-being','wellbeing','physical','social','environment','satisfaction','qol','whoqol']},
+    {name:'Intelligence Screening (Ages 5-16)',url:'/test/wisc_v',age:'5-16 years',time:'15 min',desc:'WISC-V adapted screening measuring Verbal, Visual-Spatial, Fluid Reasoning, Working Memory, and Processing Speed.',keywords:['iq','intellig','child','children','kid','wisc','gifted','smart','learn','school','5','6','7','8','9','10','11','12','13','14','15','16']},
+    {name:'Intelligence Screening (Ages 17-30)',url:'/test/wais_v_young',age:'17-30 years',time:'20 min',desc:'WAIS-V adapted for young adults with advanced reasoning, vocabulary, and spatial processing.',keywords:['iq','intellig','young','adult','college','university','wais','17','18','19','20','21','25','30']},
+    {name:'Intelligence Screening (Ages 31-55)',url:'/test/wais_v_adult',age:'31-55 years',time:'20 min',desc:'WAIS-V adapted for adults with practical knowledge and real-world reasoning assessments.',keywords:['iq','intellig','adult','middle','wais','31','35','40','45','50','55']},
+    {name:'Cognitive Screening (Ages 56+)',url:'/test/moca',age:'56+ years',time:'10 min',desc:'MoCA adapted screening for visuospatial, naming, memory, attention, language, and orientation.',keywords:['moca','senior','elderly','older','dementia','alzheimer','cognitive decline','forget','memory loss','56','60','65','70','75','80','aging','ageing']}
+  ];
+
+  // Find matching tests
+  var matched=[];
+  tests.forEach(function(t){
+    var score=0;
+    t.keywords.forEach(function(kw){if(ql.includes(kw))score++});
+    if(score>0)matched.push({test:t,score:score});
+  });
+  matched.sort(function(a,b){return b.score-a.score});
+
+  // ═══ TOPIC-BASED RESPONSES ═══
+
+  // Age-based recommendation
+  var ageMatch=ql.match(/(\d+)\s*(year|yr|age|old)/);
+  if(ageMatch){
+    var age=parseInt(ageMatch[1]);
+    var rec;
+    if(age>=5&&age<=16)rec=tests[5];
+    else if(age>=17&&age<=30)rec=tests[6];
+    else if(age>=31&&age<=55)rec=tests[7];
+    else if(age>=56)rec=tests[8];
+    if(rec)return 'For someone aged <strong>'+age+'</strong>, I recommend the <a href="'+rec.url+'">'+rec.name+'</a> ('+rec.time+').<br><br>'+rec.desc;
+  }
+
+  // Improvement questions
+  if(ql.includes('improve')||ql.includes('better')||ql.includes('increase')||ql.includes('boost')){
+    if(ql.includes('iq')||ql.includes('intellig'))return 'To improve cognitive abilities:<br><br><strong>1. Read widely</strong> — builds vocabulary and verbal reasoning<br><strong>2. Play strategy games</strong> — chess, puzzles strengthen fluid reasoning<br><strong>3. Exercise regularly</strong> — aerobic exercise improves processing speed<br><strong>4. Practice memory exercises</strong> — dual n-back training improves working memory<br><strong>5. Get quality sleep</strong> — 7-9 hours is essential for cognitive function<br><br>Take the <a href="/test/wais_v_young">Intelligence Screening</a> to see your baseline scores.';
+    if(ql.includes('memory'))return 'To improve memory:<br><br><strong>1. Spaced repetition</strong> — review information at increasing intervals<br><strong>2. Mnemonics</strong> — use acronyms, visual associations, memory palaces<br><strong>3. Mindfulness meditation</strong> — even 10 minutes daily strengthens working memory<br><strong>4. Physical exercise</strong> — walking 30 min/day boosts hippocampal function<br><strong>5. Adequate sleep</strong> — memory consolidation occurs during deep sleep<br><br>Try the <a href="/test/digit_span">Digit Span Test</a> to measure your current memory capacity.';
+    if(ql.includes('depress')||ql.includes('mood'))return 'To improve mood and manage depression:<br><br><strong>1. Regular exercise</strong> — even 20 minutes of walking has antidepressant effects<br><strong>2. Social connection</strong> — reach out to friends, join groups or communities<br><strong>3. Sleep hygiene</strong> — consistent sleep schedule, dark room, no screens before bed<br><strong>4. Professional support</strong> — therapy (especially CBT) is highly effective<br><strong>5. Mindfulness</strong> — meditation and journaling help regulate emotions<br><br>⚠ If you are in crisis, please contact a helpline immediately.<br><br>Take the <a href="/test/depression_screening">Depression Screening</a> to assess your current state.';
+    return 'Here are general tips for cognitive improvement:<br><br><strong>1. Physical exercise</strong> — the single most impactful thing for brain health<br><strong>2. Quality sleep</strong> — 7-9 hours nightly<br><strong>3. Mental challenges</strong> — puzzles, reading, learning new skills<br><strong>4. Social engagement</strong> — conversation and social activities protect cognition<br><strong>5. Healthy diet</strong> — Mediterranean diet is associated with better brain health<br><br>Take an assessment first to identify specific areas: <a href="#tests">View all tests</a>';
+  }
+
+  // What does score mean
+  if(ql.includes('score')||ql.includes('mean')||ql.includes('result')||ql.includes('interpret')){
+    if(ql.includes('depress')||ql.includes('bdi'))return '<strong>Depression Screening (BDI) Score Ranges:</strong><br><br>• <strong>0-13:</strong> Minimal depression<br>• <strong>14-19:</strong> Mild depression<br>• <strong>20-28:</strong> Moderate depression<br>• <strong>29-63:</strong> Severe depression<br><br>Higher scores indicate more severe symptoms. This is a screening tool — a professional diagnosis requires clinical evaluation.';
+    if(ql.includes('iq')||ql.includes('intellig')||ql.includes('wisc')||ql.includes('wais'))return '<strong>IQ Score Classification:</strong><br><br>• <strong>130+:</strong> Very Superior<br>• <strong>120-129:</strong> Superior<br>• <strong>110-119:</strong> High Average<br>• <strong>90-109:</strong> Average<br>• <strong>80-89:</strong> Low Average<br>• <strong>70-79:</strong> Borderline<br>• <strong>Below 70:</strong> Extremely Low<br><br>Note: Our adapted screening gives an estimate — a formal IQ test must be administered by a licensed psychologist.';
+    if(ql.includes('moca'))return '<strong>MoCA Score Interpretation:</strong><br><br>• <strong>26-30:</strong> Normal cognition<br>• <strong>22-25:</strong> Mild cognitive impairment (MCI)<br>• <strong>17-21:</strong> Moderate impairment<br>• <strong>Below 17:</strong> Severe impairment<br><br>A score below 26 suggests further clinical evaluation may be needed. Add 1 point if education ≤ 12 years.';
+    return 'Each test has its own scoring system. Which test are you asking about? I can explain <a href="/test/depression_screening">Depression (BDI)</a>, <a href="/test/wisc_v">IQ (WISC/WAIS)</a>, <a href="/test/moca">MoCA</a>, or <a href="/test/quality_of_life">Quality of Life</a> scores.';
+  }
+
+  // Which test should I take
+  if(ql.includes('which test')||ql.includes('what test')||ql.includes('recommend')||ql.includes('should i take')||ql.includes('right test')){
+    return 'It depends on what you want to assess:<br><br>• <strong>Feeling sad or low?</strong> → <a href="/test/depression_screening">Depression Screening</a><br>• <strong>Memory concerns?</strong> → <a href="/test/digit_span">Digit Span Test</a><br>• <strong>Attention/focus issues?</strong> → <a href="/test/stroop_test">Stroop Test</a> or <a href="/test/trail_making">Trail Making</a><br>• <strong>Overall intelligence?</strong> → IQ Screening for your age group<br>• <strong>Life satisfaction?</strong> → <a href="/test/quality_of_life">Quality of Life</a><br>• <strong>Cognitive decline (56+)?</strong> → <a href="/test/moca">MoCA Screening</a><br><br>What specifically concerns you? I can narrow it down.';
+  }
+
+  // Matched tests found
+  if(matched.length>0){
+    var r='Based on your question, here are the most relevant assessments:<br><br>';
+    matched.slice(0,3).forEach(function(m){
+      r+='<strong><a href="'+m.test.url+'">'+m.test.name+'</a></strong> ('+m.test.age+', '+m.test.time+')<br>'+m.test.desc+'<br><br>';
+    });
+    return r;
+  }
+
+  // General/fallback
+  return 'I can help you with:<br><br>• <strong>Finding the right test</strong> — tell me your age or concern<br>• <strong>Understanding scores</strong> — ask about any test results<br>• <strong>Improvement tips</strong> — how to boost specific cognitive areas<br>• <strong>Test information</strong> — what each assessment measures<br><br>We currently have <strong>9 assessments</strong> covering depression, intelligence, memory, attention, and quality of life. <a href="#tests">Browse all tests</a>';
+}
+
 </script>
+
+<!-- AI SEARCH MODAL -->
+<div class="ai-modal-bg" id="aiModalBg">
+  <div class="ai-modal">
+    <div class="ai-header">
+      <div class="ai-logo">AI</div>
+      <div><div class="ai-header-text">ManMulyankan AI Assistant</div><div class="ai-header-sub">Ask anything about cognitive assessments</div></div>
+      <button class="ai-close" onclick="closeAI()">Close</button>
+    </div>
+    <div class="ai-body" id="aiBody">
+      <div class="ai-msg ai">
+        <div class="ai-bubble">Hi! I can help you find the right assessment, explain test results, or answer questions about cognitive and mental health topics. What would you like to know?
+          <div class="ai-suggestions">
+            <span class="ai-sug" onclick="askAI('Which test should I take for memory problems?')">Memory problems?</span>
+            <span class="ai-sug" onclick="askAI('What does my depression score mean?')">Depression scores</span>
+            <span class="ai-sug" onclick="askAI('How can I improve my IQ score?')">Improve IQ</span>
+            <span class="ai-sug" onclick="askAI('What test is best for a 10 year old child?')">Tests for children</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ai-input-wrap">
+      <input class="ai-input" id="aiInput" placeholder="Ask about assessments, results, mental health..." onkeydown="if(event.key==='Enter')sendAI()">
+      <button class="ai-send" onclick="sendAI()">Send</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
