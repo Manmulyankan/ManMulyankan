@@ -374,7 +374,13 @@ function calculateResults(){
   },300);
 
   // Auto-save
-  saveResultsToServer('wais_v_adult',{fsiq:fsiq,classification:cls,domains:domainScores,answers:answers.slice()});
+  // Build detailed response data
+  var detailedAnswers=[];
+  questions.forEach(function(q,i){
+    var d=domains[q.d];
+    detailedAnswers.push({question:q.q,answer:q.opts[answers[i]]||'-',correct_answer:q.opts[q.a],score:answers[i]===q.a?1:0,domain:d.name});
+  });
+  saveResultsToServer('wais_v_adult',{fsiq:fsiq,classification:cls,domains:domainScores,answers:detailedAnswers});
   saveResultsToFile('wais_v_adult',{fsiq:fsiq,classification:cls,domains:domainScores,answers:answers.slice()});
 }
 

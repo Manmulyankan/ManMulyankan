@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Admin Dashboard — ManMulyankan</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#1e2028;--card:#2a2d35;--border:#363840;--navy:#eaecf0;--ink:#c8ccd4;--slate:#9498a4;--grey:#70747e;--blue:#6b8aff;--blue-d:#5570d9;--green:#5ec49a;--red:#f07070;--yellow:#f0b830;--r:12px;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace}
@@ -220,7 +220,7 @@ async function loadResults() {
           '<td><span class="test-badge '+testBadgeClass(r.test_type)+'">'+testLabel(r.test_type)+'</span></td>'+
           '<td style="font-size:.8rem;color:var(--grey)">'+fmtDate(r.completed_at)+'</td>'+
           '<td><span class="score-pill">'+getKeyScore(r)+'</span></td>'+
-          '<td><button class="act-btn" onclick="viewDetail('+r.id+')">View</button><button class="act-btn" onclick="downloadPDF('+r.id+')" style="color:var(--red)">PDF</button><button class="act-btn" onclick="downloadWord('+r.id+')" style="color:var(--blue)">Word</button><button class="act-btn del" onclick="deleteResult('+r.id+')">Delete</button></td>'+
+          '<td><button class="act-btn" onclick="viewDetail('+r.id+')">View</button><button class="act-btn" onclick="downloadHTML('+r.id+')" style="color:var(--green)">Download</button><button class="act-btn del" onclick="deleteResult('+r.id+')">Delete</button></td>'+
           '</tr>';
       }).join('');
     }
@@ -255,8 +255,8 @@ async function viewDetail(id) {
     html += '<h4 style="margin-top:16px;font-size:.82rem;color:var(--grey);font-weight:700">RAW ANSWERS</h4>';
     html += '<div class="json-block">'+JSON.stringify(d.raw_answers, null, 2)+'</div>';
     html += '<div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap">';
-    html += '<button class="act-btn" onclick="downloadPDF('+d.id+')" style="padding:10px 20px;font-size:.82rem;color:var(--red);border-color:var(--red)">Download PDF</button>';
-    html += '<button class="act-btn" onclick="downloadWord('+d.id+')" style="padding:10px 20px;font-size:.82rem;color:var(--blue);border-color:var(--blue)">Download Word</button>';
+    html += '<button class="act-btn" onclick="downloadHTML('+d.id+')" style="padding:10px 20px;font-size:.82rem;color:var(--green);border-color:var(--green)">Download Report</button>';
+    html += '<button class="act-btn" onclick="downloadTXT('+d.id+')" style="padding:10px 20px;font-size:.82rem;color:var(--blue);border-color:var(--blue)">Text File</button>';
     html += '</div>';
     document.getElementById('modalBody').innerHTML = html;
     document.getElementById('modalBg').classList.add('show');
@@ -304,144 +304,345 @@ async function changePassword(){
 }
 
 // ═══ PDF DOWNLOAD ═══
-async function downloadPDF(id){
+async function downloadHTML(id){
   try{
     var res=await fetch('/api/admin/results/'+id);
     var d=await res.json();
-    var jsPDF=window.jspdf.jsPDF;
-    var doc=new jsPDF('p','mm','a4');
-    var y=20,lm=20,pw=170;
-
-    // Header
-    doc.setFillColor(26,58,176);doc.rect(0,0,210,40,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont('helvetica','bold');
-    doc.text('ManMulyankan',lm,18);
-    doc.setFontSize(10);doc.setFont('helvetica','normal');
-    doc.text('Cognitive Assessment Report',lm,26);
-    doc.text(testLabel(d.test_type),lm,33);
-
-    // Participant Info
-    y=52;doc.setTextColor(40,40,60);doc.setFontSize(14);doc.setFont('helvetica','bold');
-    doc.text('Participant Details',lm,y);y+=10;
-    doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
-    var info=[['Name',d.participant_name],['Age',String(d.participant_age||'--')],['Test',testLabel(d.test_type)],['Started',fmtDate(d.started_at)],['Completed',fmtDate(d.completed_at)]];
-    if(d.started_at&&d.completed_at){
-      var dur=Math.round((new Date(d.completed_at)-new Date(d.started_at))/1000);
-      var mins=Math.floor(dur/60),secs=dur%60;
-      info.push(['Duration',mins+'m '+secs+'s']);
-    }
-    if(d.interpretation)info.push(['Interpretation',d.interpretation]);
-    info.forEach(function(r){
-      doc.setFont('helvetica','bold');doc.text(r[0]+':',lm,y);
-      doc.setFont('helvetica','normal');doc.text(String(r[1]),lm+40,y);y+=7;
-    });
-
-    // Scores
-    y+=5;doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(40,40,60);
-    doc.text('Scores',lm,y);y+=10;
-    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
-    var scoreStr=JSON.stringify(d.scores,null,2);
-    var scoreLines=doc.splitTextToSize(scoreStr,pw);
-    scoreLines.forEach(function(line){
-      if(y>270){doc.addPage();y=20}
-      doc.text(line,lm,y);y+=5;
-    });
-
-    // Raw Answers
-    y+=5;if(y>250){doc.addPage();y=20}
-    doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(40,40,60);
-    doc.text('Raw Answers',lm,y);y+=10;
-    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
-    var ansStr=JSON.stringify(d.raw_answers,null,2);
-    var ansLines=doc.splitTextToSize(ansStr,pw);
-    ansLines.forEach(function(line){
-      if(y>270){doc.addPage();y=20}
-      doc.text(line,lm,y);y+=4;
-    });
-
-    // Footer
-    var pages=doc.internal.getNumberOfPages();
-    for(var i=1;i<=pages;i++){
-      doc.setPage(i);doc.setFontSize(7);doc.setTextColor(150,150,150);
-      doc.text('ManMulyankan — manmulyankan.com — Generated '+new Date().toLocaleDateString(),lm,290);
-      doc.text('Page '+i+' of '+pages,180,290);
-    }
-
-    doc.save(d.participant_name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+d.test_type+'_report.pdf');
-  }catch(e){console.error(e);alert('Error generating PDF')}
-}
-
-// ═══ WORD DOWNLOAD ═══
-async function downloadWord(id){
-  try{
-    var res=await fetch('/api/admin/results/'+id);
-    var d=await res.json();
-
     var dur='--';
     if(d.started_at&&d.completed_at){
       var secs=Math.round((new Date(d.completed_at)-new Date(d.started_at))/1000);
       dur=Math.floor(secs/60)+'m '+secs%60+'s';
     }
 
-    var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">';
-    html+='<head><meta charset="UTF-8"><style>';
-    html+='body{font-family:Calibri,Arial,sans-serif;color:#333;line-height:1.6;margin:40px}';
-    html+='h1{color:#1a3ab0;font-size:24pt;margin-bottom:4px}';
-    html+='h2{color:#2a4ecf;font-size:16pt;margin-top:24px;border-bottom:2px solid #2a4ecf;padding-bottom:4px}';
-    html+='h3{color:#555;font-size:12pt;margin-top:16px}';
-    html+='.header-sub{color:#777;font-size:11pt}';
-    html+='table{border-collapse:collapse;width:100%;margin:10px 0}';
-    html+='th,td{border:1px solid #ccc;padding:8px 12px;text-align:left;font-size:10pt}';
-    html+='th{background:#f0f2f8;font-weight:bold;color:#333}';
-    html+='.score-table td:first-child{font-weight:bold;width:40%}';
-    html+='pre{background:#f5f5f5;border:1px solid #ddd;padding:12px;font-size:9pt;font-family:Consolas,monospace;white-space:pre-wrap;overflow-wrap:break-word}';
-    html+='.footer{margin-top:32px;padding-top:12px;border-top:1px solid #ccc;font-size:8pt;color:#999}';
-    html+='</style></head><body>';
+    var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">';
+    html+='<title>'+d.participant_name+' — '+testLabel(d.test_type)+' Report</title>';
+    html+='<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">';
+    html+='<style>';
+    html+='*{box-sizing:border-box;margin:0;padding:0}';
+    html+='body{font-family:"Outfit",sans-serif;background:#1e2028;color:#c8ccd4;min-height:100vh;padding:30px}';
+    html+='.wrap{max-width:700px;margin:0 auto}';
+    html+='.header{background:#1a2340;border-radius:14px;padding:24px 28px;margin-bottom:24px}';
+    html+='.header h1{font-size:1.5rem;font-weight:900;color:#fff;margin-bottom:2px}';
+    html+='.header .sub{font-size:.72rem;color:#6880a8}';
+    html+='.header .test-name{font-size:.88rem;font-weight:700;color:#6b8aff;margin-top:8px}';
+    html+='.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}';
+    html+='.info-item{font-size:.78rem;color:#9098b0}';
+    html+='.info-item strong{color:#c0c8e0}';
+    html+='.card{background:#2a2d35;border:1.5px solid #363840;border-radius:14px;padding:24px;margin-bottom:18px}';
+    html+='.card h2{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#70747e;margin-bottom:16px;display:flex;align-items:center;gap:8px}';
+    html+='.card h2::before{content:"";width:4px;height:14px;background:linear-gradient(180deg,#6b8aff,#b49dff);border-radius:2px}';
+    // Score ring
+    html+='.score-center{text-align:center;margin-bottom:20px}';
+    html+='.score-big{font-size:3rem;font-weight:900;font-family:"JetBrains Mono",monospace;background:linear-gradient(135deg,#6b8aff,#b49dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}';
+    html+='.score-label{font-size:.68rem;color:#70747e;text-transform:uppercase;letter-spacing:.1em;font-weight:600}';
+    html+='.score-class{display:inline-block;padding:6px 18px;border-radius:50px;font-size:.82rem;font-weight:700;margin-top:8px}';
+    // Domain bars
+    html+='.domain{margin-bottom:12px}';
+    html+='.domain-meta{display:flex;justify-content:space-between;margin-bottom:4px}';
+    html+='.domain-name{font-size:.78rem;font-weight:700;color:#eaecf0}';
+    html+='.domain-val{font-size:.78rem;font-weight:700;font-family:"JetBrains Mono",monospace;color:#9498a4}';
+    html+='.domain-track{height:8px;background:#363840;border-radius:4px;overflow:hidden}';
+    html+='.domain-fill{height:100%;border-radius:4px}';
+    // Table
+    html+='.resp-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.78rem}';
+    html+='.resp-table th{background:#1a2340;color:#fff;padding:10px 12px;text-align:left;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}';
+    html+='.resp-table th:first-child{border-radius:8px 0 0 0}.resp-table th:last-child{border-radius:0 8px 0 0}';
+    html+='.resp-table td{padding:9px 12px;border-bottom:1px solid #363840;color:#c8ccd4}';
+    html+='.resp-table tr:nth-child(even) td{background:rgba(54,56,64,.3)}';
+    html+='.resp-table .score-cell{font-weight:700;font-family:"JetBrains Mono",monospace;color:#6b8aff;text-align:center}';
+    // Interpretation
+    html+='.interp{background:#1e2028;border-radius:10px;padding:16px;font-size:.82rem;line-height:1.65;color:#c8ccd4;border:1px solid #363840}';
+    html+='.interp strong{color:#eaecf0}';
+    // Disclaimer
+    html+='.disclaimer{font-size:.72rem;color:#70747e;text-align:center;padding:14px;border:1px dashed #363840;border-radius:10px;margin-top:18px;line-height:1.6}';
+    html+='.footer{text-align:center;font-size:.68rem;color:#4a4d56;margin-top:20px;padding-top:14px;border-top:1px solid #2a2e3e}';
+    // Print
+    html+='@media print{body{background:#fff!important;color:#222!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}';
+    html+='.header{background:#1a2340!important;-webkit-print-color-adjust:exact!important}.card{border-color:#ddd!important}';
+    html+='.resp-table th{background:#1a2340!important;-webkit-print-color-adjust:exact!important}}';
+    html+='</style></head><body><div class="wrap">';
 
+    // Header
+    html+='<div class="header">';
     html+='<h1>ManMulyankan</h1>';
-    html+='<div class="header-sub">Cognitive Assessment Report — '+testLabel(d.test_type)+'</div>';
+    html+='<div class="sub">Cognitive Assessment Platform · manmulyankan.com</div>';
+    html+='<div class="test-name">'+testLabel(d.test_type)+' Report</div>';
+    html+='<div class="info-grid">';
+    html+='<div class="info-item"><strong>Participant:</strong> '+d.participant_name+'</div>';
+    html+='<div class="info-item"><strong>Age:</strong> '+(d.participant_age||'--')+'</div>';
+    html+='<div class="info-item"><strong>Date:</strong> '+fmtDate(d.completed_at)+'</div>';
+    html+='<div class="info-item"><strong>Duration:</strong> '+dur+'</div>';
+    html+='</div></div>';
 
-    html+='<h2>Participant Details</h2>';
-    html+='<table class="score-table">';
-    html+='<tr><td>Name</td><td>'+d.participant_name+'</td></tr>';
-    html+='<tr><td>Age</td><td>'+(d.participant_age||'--')+'</td></tr>';
-    html+='<tr><td>Test</td><td>'+testLabel(d.test_type)+'</td></tr>';
-    html+='<tr><td>Started</td><td>'+fmtDate(d.started_at)+'</td></tr>';
-    html+='<tr><td>Completed</td><td>'+fmtDate(d.completed_at)+'</td></tr>';
-    html+='<tr><td>Duration</td><td>'+dur+'</td></tr>';
-    if(d.interpretation) html+='<tr><td>Interpretation</td><td><strong>'+d.interpretation+'</strong></td></tr>';
-    html+='</table>';
+    // Main Score
+    var scores=d.scores||{};
+    var mainScore=scores.fsiq||scores.totalScore||scores.mainScore||scores.composite||'';
+    var classification=scores.classification||d.interpretation||'';
 
-    html+='<h2>Scores</h2>';
-    if(d.scores&&typeof d.scores==='object'){
-      html+='<table>';
-      html+='<tr><th>Metric</th><th>Value</th></tr>';
-      function flattenScores(obj,prefix){
-        var rows=[];
-        Object.keys(obj).forEach(function(k){
-          var v=obj[k],label=prefix?prefix+'.'+k:k;
-          if(v&&typeof v==='object'&&!Array.isArray(v))rows=rows.concat(flattenScores(v,label));
-          else rows.push({k:label,v:Array.isArray(v)?JSON.stringify(v):String(v)});
-        });
-        return rows;
+    if(mainScore){
+      html+='<div class="card"><h2>Overall Score</h2>';
+      html+='<div class="score-center">';
+      html+='<div class="score-big">'+mainScore+'</div>';
+      html+='<div class="score-label">'+( scores.fsiq?'Estimated FSIQ':scores.totalScore?'Total Score':'Composite Score')+'</div>';
+      if(classification){
+        var clsColor='#f0b830';
+        if(classification.match(/superior|high|normal|minimal/i))clsColor='#5ec49a';
+        else if(classification.match(/low|borderline|moderate|severe|impair/i))clsColor='#f07070';
+        html+='<div class="score-class" style="background:'+clsColor+'18;color:'+clsColor+';border:1px solid '+clsColor+'30">'+classification+'</div>';
       }
-      var srows=flattenScores(d.scores,'');
-      srows.forEach(function(r){html+='<tr><td>'+r.k+'</td><td>'+r.v+'</td></tr>'});
-      html+='</table>';
+      html+='</div></div>';
     }
 
-    html+='<h2>Raw Answers</h2>';
-    html+='<pre>'+JSON.stringify(d.raw_answers,null,2).replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre>';
+    // Domain Scores
+    var domains=scores.domains||{};
+    var domKeys=Object.keys(domains);
+    if(domKeys.length>0){
+      html+='<div class="card"><h2>Domain Scores</h2>';
+      domKeys.forEach(function(k){
+        var dom=domains[k];
+        var name=dom.name||k;
+        var scaled=dom.scaled||dom.score||dom.pct||0;
+        var total=dom.total||'';
+        var correct=dom.correct||'';
+        var pct=dom.pct||(dom.scaled?Math.round((dom.scaled-55)/90*100):0);
+        pct=Math.min(100,Math.max(0,pct));
+        var color=dom.color||'#6b8aff';
+        html+='<div class="domain">';
+        html+='<div class="domain-meta"><span class="domain-name" style="color:'+color+'">'+name+'</span>';
+        html+='<span class="domain-val">'+scaled+(total?' ('+correct+'/'+total+')':'')+'</span></div>';
+        html+='<div class="domain-track"><div class="domain-fill" style="width:'+pct+'%;background:'+color+'"></div></div>';
+        html+='</div>';
+      });
+      html+='</div>';
+    }
 
-    html+='<div class="footer">Generated by ManMulyankan — manmulyankan.com — '+new Date().toLocaleDateString()+'</div>';
-    html+='</body></html>';
+    // Category breakdown (depression, QoL)
+    var cats=scores.categoryBreakdown||scores.categories||null;
+    if(cats&&typeof cats==='object'){
+      html+='<div class="card"><h2>Category Breakdown</h2>';
+      var catKeys=Array.isArray(cats)?cats:Object.keys(cats);
+      if(Array.isArray(cats)){
+        cats.forEach(function(cat){
+          var name=cat.name||cat.category||'';
+          var val=cat.score||cat.value||cat.avg||0;
+          html+='<div class="domain"><div class="domain-meta"><span class="domain-name">'+name+'</span><span class="domain-val">'+val+'</span></div></div>';
+        });
+      }else{
+        Object.keys(cats).forEach(function(k){
+          var v=cats[k];
+          html+='<div class="domain"><div class="domain-meta"><span class="domain-name">'+k+'</span><span class="domain-val">'+(typeof v==='object'?JSON.stringify(v):v)+'</span></div></div>';
+        });
+      }
+      html+='</div>';
+    }
 
-    var blob=new Blob([html],{type:'application/msword;charset=utf-8'});
+    // Interpretation
+    if(d.interpretation){
+      html+='<div class="card"><h2>Interpretation</h2>';
+      html+='<div class="interp">'+d.interpretation+'</div></div>';
+    }
+
+    // Responses Table
+    var answers=d.raw_answers;
+    if(answers&&(Array.isArray(answers)||(typeof answers==='object'&&Object.keys(answers).length>0))){
+      html+='<div class="card"><h2>Response Details</h2>';
+      html+='<table class="resp-table"><thead><tr><th>#</th><th>Item</th><th>Response</th><th>Score</th></tr></thead><tbody>';
+      if(Array.isArray(answers)){
+        answers.forEach(function(a,i){
+          var q=a.question||a.q||('Question '+(i+1));
+          var r=a.answer||a.response||a.selected||String(a);
+          var s=(a.score!==undefined)?a.score:'-';
+          html+='<tr><td>'+(i+1)+'</td><td>'+q+'</td><td>'+r+'</td><td class="score-cell">'+s+'</td></tr>';
+        });
+      }else{
+        var idx=1;
+        Object.keys(answers).forEach(function(k){
+          var v=answers[k];
+          html+='<tr><td>'+(idx++)+'</td><td>'+k+'</td><td colspan="2">'+( typeof v==='object'?JSON.stringify(v):v)+'</td></tr>';
+        });
+      }
+      html+='</tbody></table></div>';
+    }
+
+    // Disclaimer
+    html+='<div class="disclaimer">⚠ This assessment is for screening and educational purposes only. It is not a substitute for professional clinical diagnosis. Results should be interpreted by a qualified healthcare professional.</div>';
+    html+='<div class="footer">Generated by ManMulyankan (manmulyankan.com) on '+new Date().toLocaleString('en-GB')+'</div>';
+    html+='</div></body></html>';
+
+    // Download
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
     var a=document.createElement('a');a.href=URL.createObjectURL(blob);
-    a.download=d.participant_name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+d.test_type+'_report.doc';
+    a.download=d.participant_name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+d.test_type+'_report.html';
     document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
-  }catch(e){console.error(e);alert('Error generating Word file')}
+  }catch(e){console.error(e);alert('Error generating report')}
 }
+
+// ═══ TEXT FILE DOWNLOAD ═══
+async function downloadTXT(id){
+  try{
+    var res=await fetch('/api/admin/results/'+id);
+    var d=await res.json();
+    var dur='--';
+    if(d.started_at&&d.completed_at){
+      var secs=Math.round((new Date(d.completed_at)-new Date(d.started_at))/1000);
+      dur=Math.floor(secs/60)+'m '+secs%60+'s';
+    }
+    var scores=d.scores||{};
+    var line='═'.repeat(80);
+    var dash='─'.repeat(80);
+
+    var txt='';
+    txt+=line+'\n';
+    txt+='  MANMULYANKAN — COGNITIVE ASSESSMENT REPORT\n';
+    txt+='  manmulyankan.com\n';
+    txt+=line+'\n\n';
+
+    // Participant
+    txt+='  PARTICIPANT DETAILS\n';
+    txt+=dash+'\n';
+    txt+=pad('  Name:',20)+d.participant_name+'\n';
+    txt+=pad('  Age:',20)+(d.participant_age||'--')+'\n';
+    txt+=pad('  Test:',20)+testLabel(d.test_type)+'\n';
+    txt+=pad('  Started:',20)+fmtDate(d.started_at)+'\n';
+    txt+=pad('  Completed:',20)+fmtDate(d.completed_at)+'\n';
+    txt+=pad('  Duration:',20)+dur+'\n';
+    txt+=pad('  Test ID:',20)+d.id+'\n\n';
+
+    // Overall Score
+    var mainScore=scores.fsiq||scores.totalScore||scores.mainScore||scores.composite||'';
+    var classification=scores.classification||d.interpretation||'';
+    if(mainScore){
+      txt+='  OVERALL SCORE\n';
+      txt+=dash+'\n';
+      txt+=pad('  Score:',20)+mainScore+'\n';
+      if(classification) txt+=pad('  Classification:',20)+classification+'\n';
+      txt+='\n';
+    }
+
+    // Domain Scores
+    var domains=scores.domains||{};
+    var domKeys=Object.keys(domains);
+    if(domKeys.length>0){
+      txt+='  DOMAIN SCORES\n';
+      txt+=dash+'\n';
+      txt+=pad('  Domain',30)+pad('Score',10)+pad('Correct',10)+pad('Total',10)+pad('Percent',10)+'\n';
+      txt+='  '+'-'.repeat(70)+'\n';
+      domKeys.forEach(function(k){
+        var dom=domains[k];
+        txt+=pad('  '+(dom.name||k),30)+pad(String(dom.scaled||dom.score||dom.pct||'-'),10)+pad(String(dom.correct||'-'),10)+pad(String(dom.total||'-'),10)+pad(String(dom.pct||'-')+'%',10)+'\n';
+      });
+      txt+='\n';
+    }
+
+    // Category breakdown
+    var cats=scores.categoryBreakdown||scores.categories||null;
+    if(cats&&typeof cats==='object'){
+      txt+='  CATEGORY BREAKDOWN\n';
+      txt+=dash+'\n';
+      if(Array.isArray(cats)){
+        txt+=pad('  Category',30)+pad('Score',10)+pad('Value',10)+'\n';
+        txt+='  '+'-'.repeat(50)+'\n';
+        cats.forEach(function(cat){
+          txt+=pad('  '+(cat.name||cat.category||''),30)+pad(String(cat.score||cat.value||cat.avg||'-'),10)+pad(String(cat.pct||'-')+'%',10)+'\n';
+        });
+      }else{
+        Object.keys(cats).forEach(function(k){
+          txt+=pad('  '+k,30)+(typeof cats[k]==='object'?JSON.stringify(cats[k]):String(cats[k]))+'\n';
+        });
+      }
+      txt+='\n';
+    }
+
+    // Interpretation
+    if(d.interpretation){
+      txt+='  INTERPRETATION\n';
+      txt+=dash+'\n';
+      var intLines=wordWrap(d.interpretation,76);
+      intLines.forEach(function(l){txt+='  '+l+'\n';});
+      txt+='\n';
+    }
+
+    // ═══ RESPONSE TABLE ═══
+    txt+='  RESPONSE DETAILS\n';
+    txt+=line+'\n';
+
+    var answers=d.raw_answers;
+    var startTime=d.started_at?new Date(d.started_at):null;
+    var endTime=d.completed_at?new Date(d.completed_at):null;
+    var totalDurSec=startTime&&endTime?Math.round((endTime-startTime)/1000):0;
+
+    // Table header
+    var colW=[5,40,20,8,10];
+    txt+=pad('  #',colW[0])+pad('Question',colW[1])+pad('Response',colW[2])+pad('Score',colW[3])+pad('Time',colW[4])+'\n';
+    txt+='  '+'-'.repeat(colW[0]+colW[1]+colW[2]+colW[3]+colW[4])+'\n';
+
+    if(Array.isArray(answers)&&answers.length>0){
+      var avgTime=answers.length>0&&totalDurSec>0?Math.round(totalDurSec/answers.length):0;
+      answers.forEach(function(a,i){
+        var q=String(a.question||a.q||('Q'+(i+1)));
+        if(q.length>38)q=q.substring(0,35)+'...';
+        var r=String(a.answer||a.response||a.selected||a);
+        if(r.length>18)r=r.substring(0,15)+'...';
+        var s=(a.score!==undefined)?String(a.score):'-';
+        var t=(a.time||a.rt)?String(a.time||a.rt)+'s':(avgTime?'~'+avgTime+'s':'--');
+        txt+=pad('  '+(i+1),colW[0])+pad(q,colW[1])+pad(r,colW[2])+pad(s,colW[3])+pad(t,colW[4])+'\n';
+      });
+    }else if(answers&&typeof answers==='object'){
+      var keys=Object.keys(answers);
+      var avgTime=keys.length>0&&totalDurSec>0?Math.round(totalDurSec/keys.length):0;
+      keys.forEach(function(k,i){
+        var v=answers[k];
+        var q=String(k);if(q.length>38)q=q.substring(0,35)+'...';
+        var r=typeof v==='object'?JSON.stringify(v):String(v);
+        if(r.length>18)r=r.substring(0,15)+'...';
+        txt+=pad('  '+(i+1),colW[0])+pad(q,colW[1])+pad(r,colW[2])+pad('-',colW[3])+pad(avgTime?'~'+avgTime+'s':'--',colW[4])+'\n';
+      });
+    }else{
+      txt+='  No response data available.\n';
+    }
+
+    txt+='\n';
+
+    // Summary stats
+    txt+='  SUMMARY STATISTICS\n';
+    txt+=dash+'\n';
+    var totalQ=Array.isArray(answers)?answers.length:(answers?Object.keys(answers).length:0);
+    var correctCount=0;
+    if(Array.isArray(answers)){answers.forEach(function(a){if(a.score&&a.score>0)correctCount++})}
+    txt+=pad('  Total Questions:',25)+totalQ+'\n';
+    txt+=pad('  Total Duration:',25)+dur+'\n';
+    if(totalQ>0&&totalDurSec>0)txt+=pad('  Avg Time/Question:',25)+Math.round(totalDurSec/totalQ)+'s\n';
+    if(Array.isArray(answers))txt+=pad('  Correct Answers:',25)+correctCount+'/'+totalQ+' ('+Math.round(correctCount/totalQ*100)+'%)\n';
+    txt+=pad('  Test Type:',25)+d.test_type+'\n';
+    txt+=pad('  Report Generated:',25)+new Date().toLocaleString('en-GB')+'\n';
+    txt+='\n';
+
+    // Disclaimer
+    txt+=line+'\n';
+    txt+='  DISCLAIMER: This assessment is for screening purposes only.\n';
+    txt+='  Not a substitute for professional clinical diagnosis.\n';
+    txt+='  Generated by ManMulyankan (manmulyankan.com)\n';
+    txt+=line+'\n';
+
+    // Download
+    var blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=d.participant_name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+d.test_type+'_report.txt';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+  }catch(e){console.error(e);alert('Error generating text file')}
+}
+
+function pad(str,len){str=String(str);while(str.length<len)str+=' ';return str;}
+function wordWrap(str,max){
+  var words=str.split(' '),lines=[],line='';
+  words.forEach(function(w){
+    if((line+' '+w).length>max){lines.push(line);line=w}
+    else line=line?line+' '+w:w;
+  });
+  if(line)lines.push(line);
+  return lines;
+}
+
 </script>
 </body>
 </html>
