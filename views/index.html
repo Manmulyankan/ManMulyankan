@@ -109,9 +109,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .divider hr{border:none;border-top:1px solid var(--border)}
 
 /* ═══ AI SEARCH ═══ */
-.tb-search input{padding-right:44px!important}
-.ai-search-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);padding:5px 10px;background:linear-gradient(135deg,#2a4ecf,#1a3ab0);color:#fff;border:none;border-radius:7px;font-size:.65rem;font-weight:800;cursor:pointer;font-family:var(--font);letter-spacing:.04em;transition:all .2s}
-.ai-search-btn:hover{background:linear-gradient(135deg,#3558d9,#2244c0);transform:translateY(-50%) scale(1.05)}
+
+
+
 /* AI Modal */
 .ai-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);z-index:500;display:none;place-items:center}
 .ai-modal-bg.show{display:grid}
@@ -174,7 +174,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 <nav class="topbar" id="topbar">
   <a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div>
   <div class="tb-text"><div class="tb-t">ManMulyankan</div><div class="tb-s">Cognitive Assessment Platform</div></div></a>
-  <div class="tb-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="topSearch" placeholder="Ask AI or search tests..." onkeydown="if(event.key==='Enter')handleAISearch()" oninput="filterTests()"><button class="ai-search-btn" onclick="handleAISearch()" title="Ask AI">AI</button></div>
+  <div class="tb-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="topSearch" placeholder="Search tests..." onkeydown="if(event.key==='Enter')handleAISearch()" oninput="filterTests()"></div>
   <div class="tb-nav">
     <a class="tb-link" href="#about">About</a>
     <a class="tb-link" href="#tests">Tests</a>

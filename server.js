@@ -8,7 +8,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 /* === JSON FILE DATABASE === */
-const DB_PATH = path.join(__dirname, 'db', 'data.json');
+// Use Railway volume if available, otherwise local db folder
+const DB_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'db');
+const DB_PATH = path.join(DB_DIR, 'data.json');
 
 function loadDB() {
   try {
@@ -20,7 +22,7 @@ function loadDB() {
 }
 
 function saveDB(data) {
-  fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
+  fs.mkdirSync(DB_DIR, { recursive: true });
   fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 }
 
