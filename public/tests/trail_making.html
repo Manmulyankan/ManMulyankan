@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Trail Making Test — ManMulyankan</title>
+<title>Trail Making Test — Man Mulyankan</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -214,7 +214,7 @@ canvas{display:block;width:100%;cursor:crosshair;background:var(--offwhite)}
 </head>
 <body>
 <div class="shapes-layer"><div class="shape sh-c1"></div><div class="shape sh-s1"></div><div class="shape sh-t1"></div><div class="shape sh-c2"></div><div class="shape sh-t2"></div><div class="shape sh-s2"></div><div class="shape sh-c3"></div></div>
-<div class="topbar"><a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div><div><div class="tb-title">ManMulyankan</div><div class="tb-sub">Trail Making Test &middot; TMT-A &amp; B</div></div></a>
+<div class="topbar"><a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div><div><div class="tb-title">Man Mulyankan</div><div class="tb-sub">Trail Making Test &middot; TMT-A &amp; B</div></div></a>
   <a href="/" style="margin-left:auto;font-size:.76rem;color:var(--slate);text-decoration:none;font-weight:600;padding:6px 14px;border:1px solid var(--ice,#363840);border-radius:8px;transition:all .2s" onmouseover="this.style.color='var(--blue,#6b8aff)';this.style.borderColor='var(--blue,#6b8aff)'" onmouseout="this.style.color='var(--slate,#9498a4)';this.style.borderColor='var(--ice,#363840)'">All Tests</a><span class="tb-badge" style="margin-left:0">Neuropsych Assessment</span></div>
 <div class="main-wrap">
 
@@ -222,6 +222,7 @@ canvas{display:block;width:100%;cursor:crosshair;background:var(--offwhite)}
   <div class="card welcome-card">
     <div class="eyebrow"><span class="eyebrow-dot"></span> Cognitive Assessment</div>
     <h2><span>Trail Making</span> Test</h2>
+    <div style="display:inline-block;padding:6px 18px;background:rgba(180,157,255,.1);border:1px solid rgba(180,157,255,.15);border-radius:50px;font-size:.75rem;font-weight:700;color:#b49dff;margin:10px 0 8px">Ages 8+</div>
     <p class="sub">A clinically validated neuropsychological assessment. Complete both parts for a full cognitive profile.</p>
     <div class="info-grid">
       <div class="info-box"><h3><span class="mk"></span> Part A &mdash; Processing Speed</h3><ul><li>Numbers 1&ndash;25 scattered randomly on screen</li><li>Connect them in order: 1 &rarr; 2 &rarr; 3 &rarr; &hellip; &rarr; 25</li><li>All circles look identical &mdash; you must find each one</li><li>Measures: visual search &amp; psychomotor speed</li></ul></div>
@@ -239,7 +240,8 @@ canvas{display:block;width:100%;cursor:crosshair;background:var(--offwhite)}
     <p class="pi-sub">Please enter your information before starting the assessment.</p>
     <div class="field-row">
       <div class="field-group full"><label class="field-label" for="piName">Full Name</label><input type="text" class="field-input" id="piName" placeholder="e.g. John Smith" autocomplete="name" maxlength="16"><div class="field-error" id="piNameErr"></div></div>
-      <div class="field-group"><label class="field-label" for="piAge">Age</label><input type="number" class="field-input" id="piAge" placeholder="e.g. 34" min="5" max="120"><div class="field-error" id="piAgeErr"></div></div>
+      <div class="field-group"><label class="field-label" for="piAge">Age</label><input type="number" class="field-input" id="piAge" placeholder="e.g. 8" min="8" max="120"><div class="field-error" id="piAgeErr"></div></div>
+      <div class="field-group full"><label class="field-label">Gender</label><div style="display:flex;gap:10px;margin-top:6px"><label style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:rgba(107,138,255,.05);border:2px solid var(--ice,#363840);border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--navy,#eaecf0);transition:all .2s" onclick="this.querySelector('input').checked=true;document.querySelectorAll('.g-opt').forEach(e=>e.style.borderColor='var(--ice,#363840)');this.style.borderColor='#6b8aff'" class="g-opt"><input type="radio" name="pGender" value="Male" style="accent-color:#6b8aff"> <span style="color:#5bb8f5">♂</span> Male</label><label style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:rgba(107,138,255,.05);border:2px solid var(--ice,#363840);border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--navy,#eaecf0);transition:all .2s" onclick="this.querySelector('input').checked=true;document.querySelectorAll('.g-opt').forEach(e=>e.style.borderColor='var(--ice,#363840)');this.style.borderColor='#b49dff'" class="g-opt"><input type="radio" name="pGender" value="Female" style="accent-color:#b49dff"> <span style="color:#f07070">♀</span> Female</label><label style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:rgba(107,138,255,.05);border:2px solid var(--ice,#363840);border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--navy,#eaecf0);transition:all .2s" onclick="this.querySelector('input').checked=true;document.querySelectorAll('.g-opt').forEach(e=>e.style.borderColor='var(--ice,#363840)');this.style.borderColor='#5ec49a'" class="g-opt"><input type="radio" name="pGender" value="Other" style="accent-color:#5ec49a"> <span style="color:#f0b830">⚧</span> Other</label></div></div>
     </div>
     <div class="pi-note"><span class="pi-note-icon">i</span><span>Your information is only used locally for your results report.</span></div>
     <button class="btn btn-primary" id="startBtn">Start Assessment &rarr;</button>
@@ -551,7 +553,7 @@ function triggerSave(){
   // Build standalone HTML
   var pName=window.participantName||window._pName||'Participant';
   var pAge=window.participantAge||window._pAge||'';
-  var testTitle=document.title||'ManMulyankan Assessment';
+  var testTitle=document.title||'Man Mulyankan Assessment';
   var now=new Date();
   var dateStr=now.toLocaleDateString('en-GB')+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   
@@ -573,7 +575,7 @@ function triggerSave(){
   
   // Header
   html+='<div style="background:#1a2340;padding:20px 28px;border-radius:12px;margin-bottom:24px">';
-  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">ManMulyankan</div>';
+  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">Man Mulyankan</div>';
   html+='<div style="font-size:.7rem;color:#8890a4;margin-bottom:10px">Cognitive Assessment Platform · manmulyankan.com</div>';
   html+='<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.78rem;color:#c0c4d0">';
   html+='<span><strong style="color:#6b8aff">Participant:</strong> '+pName+'</span>';
@@ -592,7 +594,7 @@ function triggerSave(){
   
   // Footer
   html+='<div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid #2a2e3e;font-size:.7rem;color:#5c6278">';
-  html+='Generated by ManMulyankan (manmulyankan.com) on '+dateStr;
+  html+='Generated by Man Mulyankan (manmulyankan.com) on '+dateStr;
   html+='<br>This assessment is for screening purposes only — not a substitute for professional clinical diagnosis.</div>';
   
   html+='<script src="/game-fx.js"></script>

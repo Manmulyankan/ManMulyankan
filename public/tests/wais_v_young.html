@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>WAIS-V Adapted Screening (17–30) — ManMulyankan</title>
+<title>WAIS-V Adapted Screening (17–30) — Man Mulyankan</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -110,9 +110,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 <body>
 <div class="shapes"><div class="sc1"></div><div class="ss1"></div><div class="st1"></div></div>
 <div class="topbar">
-  <a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div><div><div class="tb-title">ManMulyankan</div><div class="tb-sub">Cognitive Intelligence · WAIS-V Adapted</div></div></a>
+  <a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none"><div class="tb-logo"></div><div><div class="tb-title">Man Mulyankan</div><div class="tb-sub">Cognitive Intelligence · WAIS-V Adapted</div></div></a>
   <a href="/" class="btn btn-home" style="margin-left:auto">All Tests</a>
-  <span class="tb-badge">Ages 17–30</span>
+  <span class="tb-badge">Ages 17-30 Yrs</span>
 </div>
 
 <div class="progress-wrap" id="progressWrap" style="display:none">
@@ -126,13 +126,14 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
   <div class="hero">
     <div class="hero-icon">IQ</div>
     <h1>Intelligence Screening</h1>
-    <div class="age-badge">Designed for Ages 17 – 30</div>
+    <div class="age-badge">Designed for Ages 17-30 Yrs</div>
     <p>This adapted screening tool evaluates cognitive abilities across five key domains based on the WISC-V framework: Verbal Comprehension, Visual Spatial, Fluid Reasoning, Working Memory, and Processing Speed.</p>
     <p style="color:var(--grey);font-size:.78rem;margin-top:12px">⏱ Approximately 15–20 minutes · 50 questions · Immediate results</p>
   </div>
   <div class="card">
     <div class="field"><label>Participant Name</label><input type="text" id="pName" maxlength="16" placeholder="Enter full name"></div>
-    <div class="field"><label>Age (5–16)</label><input type="number" id="pAge" min="5" max="16" placeholder="Enter age"></div>
+    <div class="field"><label>Age (17–30)</label><input type="number" id="pAge" min="17" max="30" placeholder="Enter age"></div>
+    <div class="field"><label>Gender</label><div style="display:flex;gap:10px;margin-top:6px"><label style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:var(--card,#2a2d35);border:2px solid var(--ice,#363840);border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--navy,#eaecf0);transition:all .2s" onclick="this.querySelector('input').checked=true;document.querySelectorAll('.g-opt').forEach(e=>e.style.borderColor='var(--ice,#363840)');this.style.borderColor='#6b8aff'" class="g-opt"><input type="radio" name="pGender" value="Male" style="accent-color:#6b8aff"> <span style="color:#5bb8f5">♂</span> Male</label><label style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:var(--card,#2a2d35);border:2px solid var(--ice,#363840);border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--navy,#eaecf0);transition:all .2s" onclick="this.querySelector('input').checked=true;document.querySelectorAll('.g-opt').forEach(e=>e.style.borderColor='var(--ice,#363840)');this.style.borderColor='#b49dff'" class="g-opt"><input type="radio" name="pGender" value="Female" style="accent-color:#b49dff"> <span style="color:#f07070">♀</span> Female</label><label style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:var(--card,#2a2d35);border:2px solid var(--ice,#363840);border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--navy,#eaecf0);transition:all .2s" onclick="this.querySelector('input').checked=true;document.querySelectorAll('.g-opt').forEach(e=>e.style.borderColor='var(--ice,#363840)');this.style.borderColor='#5ec49a'" class="g-opt"><input type="radio" name="pGender" value="Other" style="accent-color:#5ec49a"> <span style="color:#f0b830">⚧</span> Other</label></div></div>
     <button class="btn btn-primary btn-full" onclick="startTest()">Begin Assessment</button>
   </div>
 </div>
@@ -147,7 +148,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 </div>
 
 <script>
-var participantName='',participantAge=0,testStartTime=null,answers=[],currentQ=0;
+var participantName='',participantAge=0,participantGender='',testStartTime=null,answers=[],currentQ=0;
 
 /* ═══ WISC-V ADAPTED QUESTIONS ═══ */
 /* 5 Domains × 10 questions each = 50 total */
@@ -224,8 +225,9 @@ function showScreen(s){document.querySelectorAll('.screen').forEach(function(el)
 function startTest(){
   var n=$('pName').value.trim(),a=parseInt($('pAge').value);
   if(!n||n.length<1){alert('Please enter participant name');return}
-  if(!a||a<17||a>30){alert('Please enter age between 17 and 30');return}
-  participantName=n;participantAge=a;testStartTime=new Date();
+  if(!a||a<17||a>30){alert('This test is designed for ages 17–30. Please enter a valid age or choose a different test.');return}
+  participantName=n;participantAge=a;
+  var gEl=document.querySelector('input[name="pGender"]:checked');participantGender=gEl?gEl.value:'Not specified';testStartTime=new Date();
   answers=new Array(questions.length).fill(-1);currentQ=0;
   $('progressWrap').style.display='block';
   if(window.gameState)gameState.total=questions.length;gameState.answered=0;gameState.streak=0;
@@ -400,7 +402,7 @@ function calculateResults(){
 
 /* ═══ SAVE TO SERVER ═══ */
 function saveResultsToServer(testName,resultData){
-  fetch('/api/results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({participant:{name:participantName,age:participantAge},test_type:testName,started_at:testStartTime?testStartTime.toISOString():new Date().toISOString(),completed_at:new Date().toISOString(),raw_answers:resultData.answers||{},scores:resultData,interpretation:resultData.classification||''})}).then(function(r){return r.json()}).then(function(d){console.log('Saved:',d)}).catch(function(e){console.log('Offline:',e)});
+  fetch('/api/results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({participant:{name:participantName,age:participantAge,gender:participantGender},test_type:testName,started_at:testStartTime?testStartTime.toISOString():new Date().toISOString(),completed_at:new Date().toISOString(),raw_answers:resultData.answers||{},scores:resultData,interpretation:resultData.classification||''})}).then(function(r){return r.json()}).then(function(d){console.log('Saved:',d)}).catch(function(e){console.log('Offline:',e)});
 }
 
 /* ═══ SAVE TO FILE ═══ */
@@ -439,7 +441,7 @@ function triggerSave(){
   // Build standalone HTML
   var pName=window.participantName||window._pName||'Participant';
   var pAge=window.participantAge||window._pAge||'';
-  var testTitle=document.title||'ManMulyankan Assessment';
+  var testTitle=document.title||'Man Mulyankan Assessment';
   var now=new Date();
   var dateStr=now.toLocaleDateString('en-GB')+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   
@@ -461,7 +463,7 @@ function triggerSave(){
   
   // Header
   html+='<div style="background:#1a2340;padding:20px 28px;border-radius:12px;margin-bottom:24px">';
-  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">ManMulyankan</div>';
+  html+='<div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:4px">Man Mulyankan</div>';
   html+='<div style="font-size:.7rem;color:#8890a4;margin-bottom:10px">Cognitive Assessment Platform · manmulyankan.com</div>';
   html+='<div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.78rem;color:#c0c4d0">';
   html+='<span><strong style="color:#6b8aff">Participant:</strong> '+pName+'</span>';
@@ -480,7 +482,7 @@ function triggerSave(){
   
   // Footer
   html+='<div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid #2a2e3e;font-size:.7rem;color:#5c6278">';
-  html+='Generated by ManMulyankan (manmulyankan.com) on '+dateStr;
+  html+='Generated by Man Mulyankan (manmulyankan.com) on '+dateStr;
   html+='<br>This assessment is for screening purposes only — not a substitute for professional clinical diagnosis.</div>';
   
   html+='<script src="/game-fx.js"></script>
